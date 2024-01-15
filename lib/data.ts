@@ -8,6 +8,7 @@ import harx from "@/public/harx-1.png";
 import animo from "@/public/animo-1.png";
 import digital360 from "@/public/360-digital.png";
 import wordanalyticsImg from "@/public/wordanalytics.png";
+import { FaAngular } from "react-icons/fa";
 
 export const links = [
   {
@@ -38,29 +39,37 @@ export const links = [
 
 export const experiencesData = [
   {
-    title: "Graduated bootcamp",
-    location: "Miami, FL",
-    description:
-      "I graduated after 6 months of studying. I immediately found a job as a front-end developer.",
-    icon: React.createElement(LuGraduationCap),
-    date: "2019",
-  },
-  {
-    title: "Front-End Developer",
+    title: "Frontend Engineer - Sekera",
     location: "Orlando, FL",
     description:
-      "I worked as a front-end developer for 2 years in 1 job and 1 year in another job. I also upskilled to the full stack.",
-    icon: React.createElement(CgWorkAlt),
-    date: "2019 - 2021",
+      "Front-End Developer at Sekera (Since February). Successfully launched the new version of the SecDojo platform within six months, collaborating with a team of talented colleagues. Contributed significantly to revenue growth and user acquisition, expanding both B2B and B2C segments",
+    icon: React.createElement(FaAngular),
+    date: "Feb 2023 - Present",
   },
   {
-    title: "Full-Stack Developer",
-    location: "Houston, TX",
+    title: "Full-Stack Developer - Digital Partnership Group",
+    location: "Casablanca, Morocco",
     description:
-      "I'm now a full-stack developer working as a freelancer. My stack includes React, Next.js, TypeScript, Tailwind, Prisma and MongoDB. I'm open to full-time opportunities.",
-    icon: React.createElement(FaReact),
-    date: "2021 - present",
+      "Full-Stack Developer at Digital Partnership Group Agency . Collaborated with a 5-member team on diverse SaaS and enterprise-only web applications. Successfully launched projects attracting multiple national clients.",
+    icon: React.createElement(CgWorkAlt),
+    date: "Aug 2021 - Feb 2023",
   },
+  {
+    title: "Graduated from FSTM",
+    location: "Morocco, Mohammedia",
+    description:
+      "Bachelor's in Computer Science from the Faculty of Science and Technology of Mohammedia. Specialized in Networking Principles, Web Development, Project Management, and Cybersecurity Basics.",
+    icon: React.createElement(LuGraduationCap),
+    date: "Nov 2021 - July 2022",
+  },
+  // {
+  //   title: "Full-Stack Developer - Digital Partnership Group",
+  //   location: "Casablanca, Morocco",
+  //   description:
+  //     "Full-Stack Developer at Digital Partnership Group Agency . Collaborated with a 5-member team on diverse SaaS and enterprise-only web applications. Successfully launched projects attracting multiple national clients.",
+  //   icon: React.createElement(CgWorkAlt),
+  //   date: "Aug 2021 - Feb 2023",
+  // },
 ] as const;
 
 export const projectsData = [
