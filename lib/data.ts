@@ -2,8 +2,11 @@ import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
 import { FaReact } from "react-icons/fa";
 import { LuGraduationCap } from "react-icons/lu";
-import corpcommentImg from "@/public/corpcomment.png";
-import rmtdevImg from "@/public/rmtdev.png";
+import cyberlabScreen from "@/public/cyberlab-screen.svg";
+import dreebz from "@/public/dreebz.png";
+import harx from "@/public/harx-1.png";
+import animo from "@/public/animo-1.png";
+import digital360 from "@/public/360-digital.png";
 import wordanalyticsImg from "@/public/wordanalytics.png";
 
 export const links = [
@@ -62,46 +65,76 @@ export const experiencesData = [
 
 export const projectsData = [
   {
-    title: "CorpComment",
+    title: "SecDojo",
     description:
-      "I worked as a full-stack developer on this startup project for 2 years. Users can give public feedback to companies.",
-    tags: ["React", "Next.js", "MongoDB", "Tailwind", "Prisma"],
-    imageUrl: corpcommentImg,
+      "Contributed to the development of the new version of the SecDojo platform (a gamified cybersecurity learning and recruitment platform.) in 6 months using technologies above",
+    tags: ["Angular", "Typescript", "TailwindCss", "RxJS", "Scss"],
+    imageUrl: cyberlabScreen,
+    projectUrl: "https://sec-dojo.com",
   },
   {
-    title: "rmtDev",
+    title: "Harx.ai",
     description:
-      "Job board for remote developer jobs. I was the front-end developer. It has features like filtering, sorting and pagination.",
-    tags: ["React", "TypeScript", "Next.js", "Tailwind", "Redux"],
-    imageUrl: rmtdevImg,
+      "HARX is a platform that connects HARXEES (you) and COMPANIES. You sell the services and products of COMPANIES at your convenience and earn a commission",
+    tags: ["Svelte", "SvelteKit", "Scss", "Node.js", "MongoDb"],
+    imageUrl: harx,
+    projectUrl: "https://harx.ai",
   },
   {
-    title: "Word Analytics",
+    title: "Dreebz",
     description:
-      "A public web app for quick analytics on text. It shows word count, character count and social media post limits.",
-    tags: ["React", "Next.js", "SQL", "Tailwind", "Framer"],
-    imageUrl: wordanalyticsImg,
+      "Worked on the Developement of Landing page to the development Dreebz an innovative platform that uses AI technology as the main means to answer user questions. After receiving an AI-generated response, Dreebz can simply and transparently connect users with qualified experts from ",
+    tags: ["HTML", "CSS", "Javascript", "PHP", "Laravel"],
+    imageUrl: dreebz,
+    projectUrl: "https://dreebz.com/fr/explore",
+  },
+  {
+    title: "Animo.ma",
+    description:
+      "Contributed to building Animo.ma(a website that is the intermediary between buyers, sellers, and people wishing to buy, sell or adopt pets.).",
+    tags: ["HTML", "CSS", "Scss", "Javascript", "Laravel", "Livewire"],
+    imageUrl: animo,
+    projectUrl: "https://animo.ma",
+  },
+  {
+    title: "360 Digital",
+    description:
+      "Built the landing page of a digital agency 360Digital that is responsive from mobile to desktop devices with some user fiendly scrolling animations using CSS keyframes",
+    tags: ["HTML", "CSS", "Scss", "Javascript"],
+    imageUrl: digital360,
+    projectUrl: "https://unruffled-haibt-10b49f.netlify.app",
   },
 ] as const;
 
 export const skillsData = [
   "HTML",
   "CSS",
+  "SASS",
+  "Tailwind",
   "JavaScript",
   "TypeScript",
+  "Angular",
+  "Angular Material",
   "React",
   "Next.js",
+  "Svelte.js",
+  "SvelteKit",
+  "PHP",
+  "Laravel.js",
   "Node.js",
-  "Git",
-  "Tailwind",
-  "Prisma",
+  "Express.Js",
+  "NestJs",
   "MongoDB",
-  "Redux",
+  "MySql",
   "GraphQL",
-  "Apollo",
-  "Express",
   "PostgreSQL",
   "Python",
-  "Django",
-  "Framer Motion",
+  "Flask",
+  "Git",
+  "Github",
+  "Gitlab",
+  "Containers",
+  "Docker",
+  "Vit",
+  "WebPack",
 ] as const;
