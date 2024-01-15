@@ -19,7 +19,16 @@ export default function About() {
     >
       <SectionHeading>About me</SectionHeading>
       <p className="mb-3">
-        After graduating with a degree in{" "}
+        I'm a web developer based in Casablanca, Morocco. I code websites from
+        the ground up. I create impactful, well-designed and feature-driven
+        websites to help businesses make a statement. I work as a Front-End
+        Engineer at Sekera, and I am dedicated to building intuitive,
+        well-designed software. I believe all websites should be modern,
+        intuitive, and responsive for all screen sizes and types – from mobile
+        to desktop. I take pride in my knowledge in various technologies to
+        build whatever – whenever. I love open source and startups.
+        {/* After
+        graduating with a degree in{" "}
         <span className="font-medium">Accounting</span>, I decided to pursue my
         passion for programming. I enrolled in a coding bootcamp and learned{" "}
         <span className="font-medium">full-stack web development</span>.{" "}
@@ -33,17 +42,17 @@ export default function About() {
         . I am also familiar with TypeScript and Prisma. I am always looking to
         learn new technologies. I am currently looking for a{" "}
         <span className="font-medium">full-time position</span> as a software
-        developer.
+        developer. */}
       </p>
 
-      <p>
+      {/* <p>
         <span className="italic">When I'm not coding</span>, I enjoy playing
         video games, watching movies, and playing with my dog. I also enjoy{" "}
         <span className="font-medium">learning new things</span>. I am currently
         learning about{" "}
         <span className="font-medium">history and philosophy</span>. I'm also
         learning how to play the guitar.
-      </p>
+      </p> */}
     </motion.section>
   );
 }
