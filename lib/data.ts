@@ -40,7 +40,7 @@ export const links = [
 export const experiencesData = [
   {
     title: "Frontend Engineer - Sekera",
-    location: "Orlando, FL",
+    location: "Casablanca, Morocco",
     description:
       "Front-End Developer at Sekera (Since February). Successfully launched the new version of the SecDojo platform within six months, collaborating with a team of talented colleagues. Contributed significantly to revenue growth and user acquisition, expanding both B2B and B2C segments",
     icon: React.createElement(FaAngular),
