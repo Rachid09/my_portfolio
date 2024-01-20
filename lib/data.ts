@@ -7,7 +7,6 @@ import dreebz from "@/public/dreebz.png";
 import harx from "@/public/harx-1.png";
 import animo from "@/public/animo-1.png";
 import digital360 from "@/public/360-digital.png";
-import wordanalyticsImg from "@/public/wordanalytics.png";
 import { FaAngular } from "react-icons/fa";
 
 export const links = [

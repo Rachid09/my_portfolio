@@ -10,9 +10,30 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Rachi ahsoune | Personal Portfolio",
+  title: "Rachid ahsoune | Personal Portfolio",
   description:
     "Rachid Ahsoune is a Front-end engineer with 4 years of experience.",
+  openGraph: {
+    title: "Rachid ahsoune | Personal Portfolio",
+    description:
+      "Rachid Ahsoune is a Front-end Engineer with 4 years of experience.",
+    url: `https://${process.env.domainName}`,
+    siteName: "Rachid Ahsoune",
+    images: [
+      {
+        url: `https://" +
+         ${process.env.domainName}
+          "/assets/profile.jpeg`,
+        width: 800,
+        height: 805,
+      },
+    ],
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
