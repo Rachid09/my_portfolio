@@ -21,9 +21,7 @@ export const metadata = {
     siteName: "Rachid Ahsoune",
     images: [
       {
-        url: `https://" +
-         ${process.env.domainName}
-          "/assets/profile.jpeg`,
+        url: `https://${process.env.domainName}/assets/profile.jpeg`,
         width: 800,
         height: 805,
       },
