@@ -32,6 +32,9 @@ export const metadata = {
     index: true,
     follow: true,
   },
+  icons: {
+    shortcut: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
