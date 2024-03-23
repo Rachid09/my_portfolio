@@ -38,6 +38,14 @@ export const links = [
 
 export const experiencesData = [
   {
+    title: "FullStack Engineer - SecDojo",
+    location: "Casablanca, Morocco",
+    description:
+      "FullStack Engineer at SecDojo since we lanched Successfully launched the new version of the SecDojo platform within six months, collaborating with a team of talented colleagues. Contributed significantly to revenue growth and user acquisition, expanding both B2B and B2C segments",
+    icon: React.createElement(FaAngular),
+    date: "Feb 2023 - Present",
+  },
+  {
     title: "Frontend Engineer - Sekera",
     location: "Casablanca, Morocco",
     description:
