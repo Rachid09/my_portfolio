@@ -57,11 +57,12 @@ export default function Project({
           </ul>
         </div>
 
-        <Image
-          src={imageUrl}
-          alt="Project I worked on"
-          quality={95}
-          className="absolute hidden sm:block top-12 -right-20 w-[26rem] rounded-t-lg shadow-2xl
+        <a href={projectUrl} target="_blank">
+          <Image
+            src={imageUrl}
+            alt="Project I worked on"
+            quality={95}
+            className="absolute hidden sm:block top-12 -right-20 w-[26rem] rounded-t-lg shadow-2xl
         transition 
         group-hover:scale-[1.04]
         group-hover:-translate-x-3
@@ -73,7 +74,8 @@ export default function Project({
         group-even:group-hover:rotate-2
 
         group-even:right-[initial] group-even:-left-20"
-        />
+          />
+        </a>
       </section>
     </motion.div>
   );
