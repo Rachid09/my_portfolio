@@ -17,11 +17,11 @@ export const metadata = {
     title: "Rachid ahsoune | Personal Portfolio",
     description:
       "Rachid Ahsoune is a Front-end Engineer with 4 years of experience.",
-    url: `https://${process.env.domainName}`,
+    url: `https://${process.env.DNS_NAME}`,
     siteName: "Rachid Ahsoune",
     images: [
       {
-        url: `https://${process.env.domainName}/assets/profile.jpeg`,
+        url: `https://${process.env.DNS_NAME}/assets/profile.jpeg`,
         width: 800,
         height: 805,
       },
