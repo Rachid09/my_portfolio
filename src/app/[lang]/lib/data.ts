@@ -7,6 +7,7 @@ import sekopsScreen from "../../../../public/sekops-screen.png";
 import dreebz from "../../../../public/dreebz.png";
 import harx from "../../../../public/harx-1.png";
 import animo from "../../../../public/animo-1.png";
+import getmanagerScreen from "../../../../public/getmanager-screen.png";
 import { FaAngular } from "react-icons/fa";
 
 export const links = [
@@ -139,6 +140,14 @@ export const projectsData = [
     tags: ["HTML", "CSS", "Scss", "Javascript", "Laravel", "Livewire"],
     imageUrl: animo,
     projectUrl: "https://animo.ma",
+  },
+  {
+    title: "GetManager",
+    description:
+      "Contributed to rebuilding GetManager (getmanager.ma) from scratch as part of a 3-person team — a full B2B SaaS ERP platform covering HR management, accounting, inventory, commercial operations, and project management. Now serving 280+ companies and 1000+ users across Morocco.",
+    tags: ["Laravel", "Vue.js", "MySQL", "REST APIs", "PHP"],
+    imageUrl: getmanagerScreen,
+    projectUrl: "https://getmanager.ma",
   },
 ] as const;
 
