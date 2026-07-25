@@ -2,11 +2,11 @@ import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
 import { FaReact } from "react-icons/fa";
 import { LuGraduationCap } from "react-icons/lu";
-import cyberlabScreen from "@/public/cyberlab-screen.svg";
-import sekopsScreen from "@/public/sekops-screen.png";
-import dreebz from "@/public/dreebz.png";
-import harx from "@/public/harx-1.png";
-import animo from "@/public/animo-1.png";
+import cyberlabScreen from "../../../../public/cyberlab-screen.svg";
+import sekopsScreen from "../../../../public/sekops-screen.png";
+import dreebz from "../../../../public/dreebz.png";
+import harx from "../../../../public/harx-1.png";
+import animo from "../../../../public/animo-1.png";
 import { FaAngular } from "react-icons/fa";
 
 export const links = [
@@ -45,12 +45,6 @@ export const links = [
     hash: "#contact",
     linkActive: true,
     url: "/#contact",
-  },
-  {
-    name: "Blog",
-    url: "/blog",
-    linkActive: true,
-    hash: "Blog",
   },
 ] as const;
 
