@@ -2,11 +2,11 @@ import React from "react";
 import { CgWorkAlt } from "react-icons/cg";
 import { FaReact } from "react-icons/fa";
 import { LuGraduationCap } from "react-icons/lu";
-import cyberlabScreen from "../../../../public/cyberlab-screen.svg";
-import dreebz from "../../../../public/dreebz.png";
-import harx from "../../../../public/harx-1.png";
-import animo from "../../../../public/animo-1.png";
-import digital360 from "../../../../public/360-digital.png";
+import cyberlabScreen from "@/public/cyberlab-screen.svg";
+import sekopsScreen from "@/public/sekops-screen.png";
+import dreebz from "@/public/dreebz.png";
+import harx from "@/public/harx-1.png";
+import animo from "@/public/animo-1.png";
 import { FaAngular } from "react-icons/fa";
 
 export const links = [
@@ -56,60 +56,76 @@ export const links = [
 
 export const experiencesData = [
   {
-    title: "FullStack Engineer - SecDojo",
+    title: "Full-Stack Engineer — SecDojo",
     location: "Casablanca, Morocco",
     description:
-      "FullStack Engineer at SecDojo since we lanched Successfully launched the new version of the SecDojo platform within six months, collaborating with a team of talented colleagues. Contributed significantly to revenue growth and user acquisition, expanding both B2B and B2C segments",
-    icon: React.createElement(FaAngular),
-    date: "Feb 2023 - Present",
-  },
-  {
-    title: "Frontend Engineer - Sekera",
-    location: "Casablanca, Morocco",
-    description:
-      "Front-End Developer at Sekera (Since February). Successfully launched the new version of the SecDojo platform within six months, collaborating with a team of talented colleagues. Contributed significantly to revenue growth and user acquisition, expanding both B2B and B2C segments",
-    icon: React.createElement(FaAngular),
-    date: "Feb 2023 - Present",
-  },
-  {
-    title: "Full-Stack Developer - Digital Partnership Group",
-    location: "Casablanca, Morocco",
-    description:
-      "Full-Stack Developer at Digital Partnership Group Agency . Collaborated with a 5-member team on diverse SaaS and enterprise-only web applications. Successfully launched projects attracting multiple national clients.",
+      "Leading full-stack development across Go backend services and Angular frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users, built RAG-based AI assistants using Google Gemini and OpenAI, and shipped B2B features for enterprise clients in banking and government sectors.",
     icon: React.createElement(CgWorkAlt),
-    date: "Aug 2021 - Feb 2023",
+    date: "Feb 2024 – Present",
   },
   {
-    title: "Graduated from FSTM",
-    location: "Morocco, Mohammedia",
+    title: "Front-End Engineer — Sekera Group",
+    location: "Casablanca, Morocco",
     description:
-      "Bachelor's in Computer Science from the Faculty of Science and Technology of Mohammedia. Specialized in Networking Principles, Web Development, Project Management, and Cybersecurity Basics.",
-    icon: React.createElement(LuGraduationCap),
-    date: "Nov 2021 - July 2022",
+      "Led Angular and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Built and maintained the company Design System, developed the Vue.js internal back-office, and guided front-end interns through onboarding and code reviews.",
+    icon: React.createElement(FaAngular),
+    date: "Feb 2023 – Feb 2024",
   },
-  // {
-  //   title: "Full-Stack Developer - Digital Partnership Group",
-  //   location: "Casablanca, Morocco",
-  //   description:
-  //     "Full-Stack Developer at Digital Partnership Group Agency . Collaborated with a 5-member team on diverse SaaS and enterprise-only web applications. Successfully launched projects attracting multiple national clients.",
-  //   icon: React.createElement(CgWorkAlt),
-  //   date: "Aug 2021 - Feb 2023",
-  // },
+  {
+    title: "Full-Stack Developer — Digital Partnership Group",
+    location: "Casablanca, Morocco",
+    description:
+      "Worked in a 5-person team building SaaS and enterprise web applications for national clients using  Laravel, PHP, JavaScript SvelteJs and ReactJS. Delivered multiple client projects from design handoff to production.",
+    icon: React.createElement(CgWorkAlt),
+    date: "Aug 2021 – Feb 2023",
+  },
+  {
+    title: "BSc Computer Science — FSTM",
+    location: "Mohammedia, Morocco",
+    description:
+      "Bachelor's in Computer Science covering networking, web development, project management and cybersecurity fundamentals.",
+    icon: React.createElement(LuGraduationCap),
+    date: "2018 – 2021",
+  },
+  {
+    title: "Intern Full-Stack Developer — Digital Partnership Group",
+    location: "Casablanca, Morocco",
+    description:
+      "Built responsive web interfaces from UI mockups using HTML, CSS and modern layout techniques. Developed UI components for Burger King's internal customer service platform, implemented REST APIs in Laravel, and migrated legacy jQuery applications to React.",
+    icon: React.createElement(LuGraduationCap),
+    date: "2020",
+  },
 ] as const;
 
 export const projectsData = [
   {
     title: "SecDojo",
     description:
-      "Contributed to the development of the new version of the SecDojo platform (a gamified cybersecurity learning and recruitment platform.) in 6 months using technologies above",
-    tags: ["Angular", "Typescript", "TailwindCss", "RxJS", "Scss"],
+      "Led front-end architecture and full-cycle development of three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness) in Angular and TypeScript with Tailwind and SCSS, owning technical decisions from system design to production delivery across all platform versions.",
+    tags: ["Angular", "Typescript", "TailwindCss", "Scss", "Go", "Laravel"],
     imageUrl: cyberlabScreen,
     projectUrl: "https://sec-dojo.com",
   },
   {
+    title: "Sekops",
+    description:
+      "Automated application security platform detecting CVEs, secrets and static vulnerabilities across enterprise codebases. Built the scanning backend in NestJS with an async job queue running multiple security scanners in parallel, and the B2B client dashboard in Next.js.",
+    tags: [
+      "NestJS",
+      "Next.js",
+      "TypeScript",
+      "PostgreSQL",
+      "Docker",
+      "OWASP",
+      "Semgrep",
+    ],
+    imageUrl: sekopsScreen,
+    projectUrl: "https://sekops.com",
+  },
+  {
     title: "Harx.ai",
     description:
-      "HARX is a platform that connects HARXEES (you) and COMPANIES. You sell the services and products of COMPANIES at your convenience and earn a commission",
+      "AI-powered Transaction-as-a-Service platform connecting businesses to a global network of 60,000+ certified agents. Built the frontend in SvelteKit, covering the company-facing dashboard, rep management interface, gig posting flows and the public landing pages.",
     tags: ["Svelte", "SvelteKit", "Scss", "Node.js", "MongoDb"],
     imageUrl: harx,
     projectUrl: "https://harx.ai",
@@ -120,7 +136,7 @@ export const projectsData = [
       "Worked on the Developement of Landing page to the development Dreebz an innovative platform that uses AI technology as the main means to answer user questions. After receiving an AI-generated response, Dreebz can simply and transparently connect users with qualified experts from ",
     tags: ["HTML", "CSS", "Javascript", "PHP", "Laravel"],
     imageUrl: dreebz,
-    projectUrl: "https://dreebz.com/fr/explore",
+    projectUrl: "https://dreebz.com",
   },
   {
     title: "Animo.ma",
@@ -130,45 +146,38 @@ export const projectsData = [
     imageUrl: animo,
     projectUrl: "https://animo.ma",
   },
-  {
-    title: "360 Digital",
-    description:
-      "Built the landing page of a digital agency 360Digital that is responsive from mobile to desktop devices with some user fiendly scrolling animations using CSS keyframes",
-    tags: ["HTML", "CSS", "Scss", "Javascript"],
-    imageUrl: digital360,
-    projectUrl: "https://unruffled-haibt-10b49f.netlify.app",
-  },
 ] as const;
 
 export const skillsData = [
-  "HTML",
-  "CSS",
-  "SASS",
-  "Tailwind",
-  "JavaScript",
-  "TypeScript",
-  "Angular",
-  "Angular Material",
-  "React",
-  "Next.js",
-  "Svelte.js",
-  "SvelteKit",
-  "PHP",
-  "Laravel.js",
-  "Node.js",
-  "Express.Js",
-  "NestJs",
-  "MongoDB",
-  "MySql",
-  "GraphQL",
-  "PostgreSQL",
+  "Go",
+  "Java",
+  "Spring Boot",
   "Python",
-  "Flask",
-  "Git",
-  "Github",
-  "Gitlab",
-  "Containers",
+  "FastAPI",
+  "NestJS",
+  "Node.js",
+  "PHP",
+  "Laravel",
+  "Next.js",
+  "React",
+  "Angular",
+  "TypeScript",
+  "JavaScript",
+  "Tailwind CSS",
+  "SCSS",
+  "PostgreSQL",
+  "MySQL",
+  "MongoDB",
+  "Redis",
+  "Qdrant",
+  "OpenAI API",
+  "Google Gemini",
+  "RAG Pipelines",
+  "MCP",
+  "LLM Agents",
   "Docker",
-  "Vit",
-  "WebPack",
+  "GitLab CI/CD",
+  "AWS",
+  "Git",
+  "Linux",
 ] as const;

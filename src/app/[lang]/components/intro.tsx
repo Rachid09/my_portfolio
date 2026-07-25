@@ -64,10 +64,11 @@ export default function Intro() {
         animate={{ opacity: 1, y: 0 }}
       >
         <span className="font-bold">Hello, I'm Rachid Ahsoune.</span> A{" "}
-        <span className="font-bold">Front-End Engineer</span> with{" "}
-        <span className="font-bold">4 years</span> of experience. I enjoy
-        building <span className="italic">sites & web apps</span>. My focus is
-        on <span className="underline">Javascript Ecosystem</span>.
+        <span className="font-bold">Full-Stack Engineer</span> with{" "}
+        <span className="font-bold">5+ years</span> of experience building
+        production systems in{" "}
+        <span className="underline">Go, Java, Next.js,Angular and AI</span>{" "}
+        integrations.
       </motion.h1>
 
       <motion.div
@@ -92,7 +93,7 @@ export default function Intro() {
 
         <a
           className="group bg-white px-7 py-3 flex items-center gap-2 rounded-full outline-none focus:scale-110 hover:scale-110 active:scale-105 transition cursor-pointer borderBlack dark:bg-white/10"
-          href="/Front-end-engineer.pdf"
+          href="/fullstack-engineer-resume.pdf"
           download
         >
           My Resume{" "}
