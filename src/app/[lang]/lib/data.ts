@@ -54,7 +54,7 @@ export const experiencesData = [
     title: "Full-Stack Engineer — SecDojo",
     location: "Casablanca, Morocco",
     description:
-      "Leading full-stack development across Go backend services and Vue.js frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users, built RAG-based AI assistants using Google Gemini and OpenAI, and shipped B2B features for enterprise clients in banking and government sectors.",
+      "Leading full-stack development across Node.js/NestJS backend services and Vue.js frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users. Built AI assistants (OpenAI, MCP, RAG) guiding B2B/B2C users through the platform in real time, automated lab creation and training-scenario workflows for the Content Security team, architected background job processing with BullMQ and Redis, and shipped B2B features for enterprise clients in banking and government sectors.",
     icon: React.createElement(CgWorkAlt),
     date: "Feb 2024 – Present",
   },
@@ -62,7 +62,7 @@ export const experiencesData = [
     title: "Front-End Engineer — Sekera Group",
     location: "Casablanca, Morocco",
     description:
-      "Led Vue.js and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Built and maintained the company Design System, developed the Vue.js internal back-office, and guided front-end interns through onboarding and code reviews.",
+      "Led Vue.js and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Developed landing pages in close collaboration with the UI/UX designer, built and maintained the Vue.js internal back-office with a Node.js (NestJS) backend, and guided front-end interns through onboarding and code reviews.",
     icon: React.createElement(FaVuejs),
     date: "Feb 2023 – Feb 2024",
   },
