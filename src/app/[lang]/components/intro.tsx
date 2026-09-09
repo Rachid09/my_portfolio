@@ -67,7 +67,7 @@ export default function Intro() {
         <span className="font-bold">Full-Stack Engineer</span> with{" "}
         <span className="font-bold">5+ years</span> of experience building
         production systems in{" "}
-        <span className="underline">Go, Java, Next.js,Angular and AI</span>{" "}
+        <span className="underline">Go, Java, Vue.js and AI</span>{" "}
         integrations.
       </motion.h1>
 

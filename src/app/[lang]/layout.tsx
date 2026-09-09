@@ -14,7 +14,7 @@ import ThemeContextProvider from "./context/theme-context";
 export const metadata: Metadata = {
   title: "Rachid Ahsoune | Full-Stack Engineer",
   description:
-    "Full-Stack Engineer specializing in Go, Java, Next.js and AI systems. Based in Casablanca, Morocco.",
+    "Full-Stack Engineer specializing in Java (Spring ), PHP (Laravel), Vue.js (TypeScript) and AI systems. Based in Casablanca, Morocco.",
 };
 
 export default function RootLayout({

@@ -8,7 +8,7 @@ import dreebz from "../../../../public/dreebz.png";
 import harx from "../../../../public/harx-1.png";
 import animo from "../../../../public/animo-1.png";
 import getmanagerScreen from "../../../../public/getmanager-screen.png";
-import { FaAngular } from "react-icons/fa";
+import { FaVuejs } from "react-icons/fa";
 
 export const links = [
   {
@@ -54,7 +54,7 @@ export const experiencesData = [
     title: "Full-Stack Engineer — SecDojo",
     location: "Casablanca, Morocco",
     description:
-      "Leading full-stack development across Go backend services and Angular frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users, built RAG-based AI assistants using Google Gemini and OpenAI, and shipped B2B features for enterprise clients in banking and government sectors.",
+      "Leading full-stack development across Go backend services and Vue.js frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users, built RAG-based AI assistants using Google Gemini and OpenAI, and shipped B2B features for enterprise clients in banking and government sectors.",
     icon: React.createElement(CgWorkAlt),
     date: "Feb 2024 – Present",
   },
@@ -62,8 +62,8 @@ export const experiencesData = [
     title: "Front-End Engineer — Sekera Group",
     location: "Casablanca, Morocco",
     description:
-      "Led Angular and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Built and maintained the company Design System, developed the Vue.js internal back-office, and guided front-end interns through onboarding and code reviews.",
-    icon: React.createElement(FaAngular),
+      "Led Vue.js and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Built and maintained the company Design System, developed the Vue.js internal back-office, and guided front-end interns through onboarding and code reviews.",
+    icon: React.createElement(FaVuejs),
     date: "Feb 2023 – Feb 2024",
   },
   {
@@ -96,18 +96,18 @@ export const projectsData = [
   {
     title: "SecDojo",
     description:
-      "Led front-end architecture and full-cycle development of three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness) in Angular and TypeScript with Tailwind and SCSS, owning technical decisions from system design to production delivery across all platform versions.",
-    tags: ["Angular", "Typescript", "TailwindCss", "Scss", "Go", "Laravel"],
+      "Led front-end architecture and full-cycle development of three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness) in Vue.js and TypeScript with Tailwind and SCSS, owning technical decisions from system design to production delivery across all platform versions.",
+    tags: ["Vue.js", "Typescript", "TailwindCss", "Scss", "Go", "Laravel"],
     imageUrl: cyberlabScreen,
     projectUrl: "https://sec-dojo.com",
   },
   {
     title: "Sekops",
     description:
-      "Automated application security platform detecting CVEs, secrets and static vulnerabilities across enterprise codebases. Built the scanning backend in NestJS with an async job queue running multiple security scanners in parallel, and the B2B client dashboard in Next.js.",
+      "Automated application security platform detecting CVEs, secrets and static vulnerabilities across enterprise codebases. Built the scanning backend in NestJS with an async job queue running multiple security scanners in parallel, and the B2B client dashboard in Vue.js.",
     tags: [
       "NestJS",
-      "Next.js",
+      "Vue.js",
       "TypeScript",
       "PostgreSQL",
       "Docker",
@@ -144,7 +144,7 @@ export const projectsData = [
   {
     title: "GetManager",
     description:
-      "Contributed to rebuilding GetManager (getmanager.ma) from scratch as part of a 3-person team — a full B2B SaaS ERP platform covering HR management, accounting, inventory, commercial operations, and project management. Now serving 280+ companies and 1000+ users across Morocco.",
+      "Contributed to rebuilding GetManager (getmanager.ma) from scratch as part of a 3-person team a full B2B SaaS ERP platform covering HR management, accounting, inventory, commercial operations, and project management. Now serving 280+ companies and 1000+ users across Morocco.",
     tags: ["Laravel", "Vue.js", "MySQL", "REST APIs", "PHP"],
     imageUrl: getmanagerScreen,
     projectUrl: "https://getmanager.ma",
@@ -163,7 +163,7 @@ export const skillsData = [
   "Laravel",
   "Next.js",
   "React",
-  "Angular",
+  "Vue.js",
   "TypeScript",
   "JavaScript",
   "Tailwind CSS",

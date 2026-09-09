@@ -21,7 +21,7 @@ export default function About() {
       <p className="mb-3">
         I'm a full-stack engineer based in Casablanca, Morocco with 5+ years
         building and scaling SaaS products from the ground up. I work across the
-        full stack . Next.js and Angular on the frontend, Go, Java and Laravel
+        full stack . Vue.js on the frontend, Go, Java and Laravel
         on the backend, and AI systems including RAG pipelines, LLM integrations
         and agent tooling. Most of my work has been on B2B and B2C platforms in
         the cybersecurity space, taking products from early versions to
