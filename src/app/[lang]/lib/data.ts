@@ -51,12 +51,20 @@ export const links = [
 
 export const experiencesData = [
   {
-    title: "Full-Stack Engineer — SecDojo",
+    title: "AI Full Stack Developer — SecDojo",
     location: "Casablanca, Morocco",
-    description:
-      "Leading full-stack development across Node.js/NestJS backend services and Vue.js frontends. Rebuilt a real-time competition system in Go from Laravel for high-concurrency performance handling 2k–10k simultaneous users. Built AI assistants (OpenAI, MCP, RAG) guiding B2B/B2C users through the platform in real time, automated lab creation and training-scenario workflows for the Content Security team, architected background job processing with BullMQ and Redis, and shipped B2B features for enterprise clients in banking and government sectors.",
+    description: [
+      "Developed a Python/FastAPI AI backend for Cyberlab and Cyberlearn, integrating OpenAI and Google GenAI with chat and file-upload APIs, conversation history and responses streamed through SSE (Server-Sent Events).",
+      "Built an autonomous assistant using Gemini and function calling, connected to business APIs to recommend labs (hands-on cybersecurity exercises), provide contextual hints and guide users through their learning journey.",
+      "Created a semantic search index from lab data and technical documentation, generating OpenAI embeddings and indexing them with metadata in Qdrant (a vector database) to support a custom RAG (Retrieval-Augmented Generation) system.",
+      "Automated the analysis of labs (hands-on cybersecurity exercises) and their write-ups (technical documentation) using Python and LangGraph to suggest mappings to MITRE ATT&CK (a knowledge base of adversary tactics and techniques) and NIST NICE (a framework describing cybersecurity roles and skills), with lab creation team validation before saving the results in the back office.",
+      "Orchestrated long-running back-office processes with n8n and Celery/RabbitMQ, using workflows that call business APIs, separate processing queues, task-status tracking and result delivery through APIs and SSE.",
+      "Led frontend architecture for three SecDojo SaaS platforms—Cyberlab, Cyberlearn and CyberAwareness—using React and Next.js, from design through production delivery.",
+      "Developed Sekops with NestJS and Next.js, orchestrating security scanners in parallel with BullMQ/Redis, from repository cloning to vulnerability detection and tracking results by commit.",
+      "Implemented GitLab CI/CD pipelines with tests, static analysis and vulnerable-dependency checks, blocking deployments that failed quality and security checks.",
+    ],
     icon: React.createElement(CgWorkAlt),
-    date: "Feb 2024 – Present",
+    date: "Jan 2024 – Present",
   },
   {
     title: "Front-End Engineer — Sekera Group",
@@ -64,15 +72,15 @@ export const experiencesData = [
     description:
       "Led Vue.js and TypeScript architecture across three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness). Developed landing pages in close collaboration with the UI/UX designer, built and maintained the Vue.js internal back-office with a Node.js (NestJS) backend, and guided front-end interns through onboarding and code reviews.",
     icon: React.createElement(FaVuejs),
-    date: "Feb 2023 – Feb 2024",
+    date: "Feb 2023 – Jan 2024",
   },
   {
     title: "Full-Stack Developer — Digital Partnership Group",
     location: "Casablanca, Morocco",
     description:
-      "Worked in a 5-person team building SaaS and enterprise web applications for national clients using  Laravel, PHP, JavaScript SvelteJs and ReactJS. Delivered multiple client projects from design handoff to production.",
+      "Worked in a 5-person team building SaaS and enterprise web applications for national clients using Laravel, PHP, JavaScript, Svelte.js and React. Delivered multiple client projects from design handoff to production.",
     icon: React.createElement(CgWorkAlt),
-    date: "Aug 2021 – Feb 2023",
+    date: "Aug 2021 – Jan 2023",
   },
   {
     title: "BSc Computer Science — FSTM",
@@ -96,24 +104,16 @@ export const projectsData = [
   {
     title: "SecDojo",
     description:
-      "Led front-end architecture and full-cycle development of three SecDojo SaaS platforms (Cyberlab, Cyberlearn, CyberAwareness) in Vue.js and TypeScript with Tailwind and SCSS, owning technical decisions from system design to production delivery across all platform versions.",
-    tags: ["Vue.js", "Typescript", "TailwindCss", "Scss", "Go", "Laravel"],
+      "Developed AI services and frontend features for Cyberlab, Cyberlearn and CyberAwareness, combining Python/FastAPI, OpenAI and Gemini integrations, Qdrant-based semantic indexing and AI-assisted back-office workflows with React and Next.js interfaces.",
+    tags: ["Python", "FastAPI", "React", "Next.js", "OpenAI", "Gemini", "Qdrant", "LangGraph", "n8n"],
     imageUrl: cyberlabScreen,
     projectUrl: "https://sec-dojo.com",
   },
   {
     title: "Sekops",
     description:
-      "Automated application security platform detecting CVEs, secrets and static vulnerabilities across enterprise codebases. Built the scanning backend in NestJS with an async job queue running multiple security scanners in parallel, and the B2B client dashboard in Vue.js.",
-    tags: [
-      "NestJS",
-      "Vue.js",
-      "TypeScript",
-      "PostgreSQL",
-      "Docker",
-      "OWASP",
-      "Semgrep",
-    ],
+      "Built an application security platform with a NestJS backend and Next.js interface, coordinating security scanners through BullMQ and Redis to detect vulnerabilities and track findings by repository commit.",
+    tags: ["NestJS", "Next.js", "BullMQ", "Redis", "PostgreSQL", "Docker", "OWASP", "Semgrep"],
     imageUrl: sekopsScreen,
     projectUrl: "https://sekops.com",
   },
@@ -128,7 +128,7 @@ export const projectsData = [
   {
     title: "Dreebz",
     description:
-      "Worked on the Developement of Landing page to the development Dreebz an innovative platform that uses AI technology as the main means to answer user questions. After receiving an AI-generated response, Dreebz can simply and transparently connect users with qualified experts from ",
+      "Contributed to the development of the Dreebz landing page, presenting a platform that uses AI to answer user questions and connects users with qualified experts.",
     tags: ["HTML", "CSS", "Javascript", "PHP", "Laravel"],
     imageUrl: dreebz,
     projectUrl: "https://dreebz.com",
@@ -136,7 +136,7 @@ export const projectsData = [
   {
     title: "Animo.ma",
     description:
-      "Contributed to building Animo.ma(a website that is the intermediary between buyers, sellers, and people wishing to buy, sell or adopt pets.).",
+      "Contributed to building Animo.ma, a platform connecting people who want to buy, sell or adopt pets.",
     tags: ["HTML", "CSS", "Scss", "Javascript", "Laravel", "Livewire"],
     imageUrl: animo,
     projectUrl: "https://animo.ma",
@@ -144,7 +144,7 @@ export const projectsData = [
   {
     title: "GetManager",
     description:
-      "Contributed to rebuilding GetManager (getmanager.ma) from scratch as part of a 3-person team a full B2B SaaS ERP platform covering HR management, accounting, inventory, commercial operations, and project management. Now serving 280+ companies and 1000+ users across Morocco.",
+      "Contributed to rebuilding GetManager (getmanager.ma) from scratch as part of a 3-person team, developing a B2B SaaS ERP platform covering HR management, accounting, inventory, commercial operations and project management. The platform serves companies and users across Morocco.",
     tags: ["Laravel", "Vue.js", "MySQL", "REST APIs", "PHP"],
     imageUrl: getmanagerScreen,
     projectUrl: "https://getmanager.ma",
@@ -152,6 +152,14 @@ export const projectsData = [
 ] as const;
 
 export const skillsData = [
+  { group: "AI / GenAI", skills: ["OpenAI API", "Google GenAI / Gemini", "LLM integration", "RAG", "Embeddings", "Vector stores", "Qdrant", "LangChain", "LangGraph", "Langfuse", "AI agents", "Function calling / tool calling", "Model Context Protocol (MCP)", "Pandas", "Scikit-learn"] },
+  { group: "Backend", skills: ["Python", "FastAPI", "Node.js", "NestJS", "Express.js", "REST APIs", "GraphQL", "SSE", "Celery", "RabbitMQ", "BullMQ", "Redis", "TypeORM", "Prisma", "Passport.js / JWT", "Keycloak"] },
+  { group: "Frontend", skills: ["React", "Next.js", "TypeScript", "JavaScript", "Redux Toolkit", "React Query / TanStack Query", "shadcn/ui", "Radix UI", "Framer Motion", "Tailwind CSS", "Sass/SCSS", "HTML5", "CSS3"] },
+  { group: "Databases and search", skills: ["PostgreSQL", "pgvector", "MySQL", "MongoDB", "Supabase", "Redis", "Qdrant", "Elasticsearch", "Algolia"] },
+  { group: "Automation, DevOps and cloud", skills: ["n8n", "Docker", "Docker Compose", "Git", "GitLab CI/CD", "Terraform", "Unix/Linux", "AWS", "Microsoft Azure"] },
+  { group: "Testing and quality", skills: ["Vitest", "Playwright", "Cypress", "SonarQube"] },
+  { group: "Additional", skills: ["Go", "Java", "Spring Boot", "PHP", "Laravel", "Vue.js"] },
+/*
   "Go",
   "Java",
   "Spring Boot",
@@ -183,4 +191,5 @@ export const skillsData = [
   "AWS",
   "Git",
   "Linux",
+*/
 ] as const;

@@ -11,6 +11,14 @@ import { experiencesData } from "../lib/data";
 import { useSectionInView } from "../lib/hooks";
 import { useTheme } from "../context/theme-context";
 
+const technologies = /\b(Python\/FastAPI|Python|FastAPI|OpenAI embeddings|OpenAI|Google GenAI|Gemini|SSE|Qdrant|RAG|LangGraph|MITRE ATT&CK|NIST NICE|n8n|Celery\/RabbitMQ|React|Next\.js|NestJS|BullMQ\/Redis|GitLab CI\/CD)\b/g;
+
+function emphasizeTechnologies(text: string) {
+  return text.split(technologies).map((part, index) =>
+    technologies.test(part) ? <strong key={index}>{part}</strong> : part,
+  );
+}
+
 export default function Experience() {
   const { ref } = useSectionInView("Experience");
   const { theme } = useTheme();
@@ -47,9 +55,15 @@ export default function Experience() {
             >
               <h3 className="font-semibold capitalize">{item.title}</h3>
               <p className="font-normal !mt-0">{item.location}</p>
-              <p className="!mt-1 !font-normal text-gray-700 dark:text-white/75">
-                {item.description}
-              </p>
+              {Array.isArray(item.description) ? (
+                <ul className="!mt-2 list-disc space-y-2 pl-5 text-gray-700 dark:text-white/75">
+                  {item.description.map((achievement, achievementIndex) => (
+                    <li className="!font-normal leading-relaxed" key={achievementIndex}>{emphasizeTechnologies(achievement)}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="!mt-1 !font-normal text-gray-700 dark:text-white/75">{item.description}</p>
+              )}
             </VerticalTimelineElement>
           </React.Fragment>
         ))}

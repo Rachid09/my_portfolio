@@ -19,13 +19,15 @@ export default function About() {
     >
       <SectionHeading>About me</SectionHeading>
       <p className="mb-3">
-        I'm a full-stack engineer based in Casablanca, Morocco with 5+ years
-        building and scaling SaaS products from the ground up. I work across the
-        full stack . Vue.js on the frontend, Go, Java and Laravel
-        on the backend, and AI systems including RAG pipelines, LLM integrations
-        and agent tooling. Most of my work has been on B2B and B2C platforms in
-        the cybersecurity space, taking products from early versions to
-        production at scale. I'm drawn to building things that grow.
+        I'm an AI Full Stack Developer based in Casablanca, Morocco, with
+        hands-on experience integrating AI systems and LLM-powered features,
+        alongside 6+ years building and delivering SaaS products from end to
+        end. My work includes conversational assistants, custom RAG systems, AI
+        agents and back-office automation. I use Python and FastAPI for AI
+        services, Node.js and NestJS for backend development, and React and
+        Next.js for frontend applications. I get involved early, understand the
+        business context and take ownership of technical decisions through
+        delivery and ongoing improvement.
         {/* After
         graduating with a degree in{" "}
         <span className="font-medium">Accounting</span>, I decided to pursue my

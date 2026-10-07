@@ -12,9 +12,25 @@ import ThemeSwitch from "./components/theme-switch";
 import ThemeContextProvider from "./context/theme-context";
 
 export const metadata: Metadata = {
-  title: "Rachid Ahsoune | Full-Stack Engineer",
+  metadataBase: new URL("https://rachidahsoune.site"),
+  title: "Rachid Ahsoune | AI Full Stack Developer",
   description:
-    "Full-Stack Engineer specializing in Java (Spring ), PHP (Laravel), Vue.js (TypeScript) and AI systems. Based in Casablanca, Morocco.",
+    "AI Full Stack Developer based in Casablanca, building SaaS products, AI agents and RAG systems with Python, FastAPI, React, Next.js and Node.js.",
+  alternates: { canonical: "https://rachidahsoune.site" },
+  openGraph: {
+    title: "Rachid Ahsoune | AI Full Stack Developer",
+    description:
+      "AI Full Stack Developer based in Casablanca, building SaaS products, AI agents and RAG systems with Python, FastAPI, React, Next.js and Node.js.",
+    url: "https://rachidahsoune.site",
+    siteName: "Rachid Ahsoune",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Rachid Ahsoune | AI Full Stack Developer",
+    description:
+      "AI Full Stack Developer based in Casablanca, building SaaS products, AI agents and RAG systems with Python, FastAPI, React, Next.js and Node.js.",
+  },
 };
 
 export default function RootLayout({
