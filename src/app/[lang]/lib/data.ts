@@ -47,6 +47,70 @@ export const links = [
     linkActive: true,
     url: "/#contact",
   },
+  {
+    name: "Case studies",
+    hash: "#case-studies",
+    linkActive: true,
+    url: "/case-studies/",
+  },
+] as const;
+
+// Static case studies served from public/case-studies/<slug>/ (newest first).
+export const caseStudiesData = [
+  {
+    slug: "regrag",
+    title: "RegRAG: cited answers from ADGM financial regulation",
+    summary:
+      "How I built RegRAG: question answering over 40 ADGM rulebooks with exact passage citations, refusals, a LangGraph pipeline on Gemini, and an evaluation on the ObliQA dataset's own labels.",
+    timeline: "Nov 2026",
+    role: "Solo, open-source",
+    tags: ["RAG", "BM25", "LangGraph", "Evaluation"],
+    thumbnail: "/case-studies/regrag/assets/screens/answer-light.jpg",
+  },
+  {
+    slug: "dojo-wizard-rag",
+    title: "Dojo Wizard: a guarded, read-only RAG assistant for SecDojo",
+    summary:
+      "How I designed and shipped Dojo Wizard, SecDojo's in-app AI assistant: custom RAG on Qdrant, Gemini function calling, SSE streaming and five layers of guardrails.",
+    timeline: "Nov 2025 – Jan 2026",
+    role: "Lead AI Engineer",
+    tags: ["RAG", "Qdrant", "Gemini", "Guardrails"],
+    thumbnail: "/case-studies/dojo-wizard-rag/assets/screens/wizard-panel-light.jpg",
+  },
+  {
+    slug: "dojo-lab-wizard-agent",
+    title:
+      "Dojo Lab Wizard: an AI agent that picks the right labs from the database",
+    summary:
+      "How I built Dojo Lab Wizard end to end for SecDojo: a drop-in front-end sidebar, a Laravel gateway and a Gemini function-calling agent that resolves every catalog dimension, guarded by a tool gateway and evaluated against SQL ground truth.",
+    timeline: "Dec 2025 – Jan 2026",
+    role: "Feature owner",
+    tags: ["AI agents", "Function calling", "Tool security", "Evaluation"],
+    thumbnail:
+      "/case-studies/dojo-lab-wizard-agent/assets/screens/step-1-answer.jpg",
+  },
+  {
+    slug: "dojo-hints",
+    title: "Dojo Hints: AI hints that unblock learners without spoiling the lab",
+    summary:
+      "How I built Dojo Hints for SecDojo: instructor-reviewed hints delivered one at a time by an AI mentor, scoped to the learner's lab instance and guarded against spoilers in both directions.",
+    timeline: "Dec 2025 – Jan 2026",
+    role: "Feature owner",
+    tags: ["LLM guardrails", "Celery", "Evaluation"],
+    thumbnail: "/case-studies/dojo-hints/assets/screens/dojo-hints-lab-page.jpg",
+  },
+  {
+    slug: "intelligent-pathways",
+    title:
+      "Intelligent Pathways: training paths built only from MITRE ATT&CK and NIST NICE",
+    summary:
+      "How I built Intelligent Pathways for SecDojo: a manager describes a training goal, Gemini maps it to MITRE and NIST NICE IDs, and only the courses and labs mapped to those IDs are ranked into a pathway, behind three validation gates.",
+    timeline: "Sep – Nov 2025",
+    role: "Feature owner",
+    tags: ["Structured output", "Recommenders", "Guardrails"],
+    thumbnail:
+      "/case-studies/intelligent-pathways/assets/screens/assistant-and-frameworks.jpg",
+  },
 ] as const;
 
 export const experiencesData = [

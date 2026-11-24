@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RegRAG — Cited answers from ADGM financial regulation | Case study</title>
+<meta name="description" content="How I built RegRAG: question answering over 40 ADGM rulebooks with exact passage citations, refusals, a LangGraph pipeline on Gemini, and an evaluation on the ObliQA dataset's own labels.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Rachid Ahsoune">
+<meta property="og:url" content="https://www.rachidahsoune.site/case-studies/regrag/">
+<meta property="og:title" content="RegRAG — Cited answers from ADGM financial regulation | Case study">
+<meta property="og:description" content="How I built RegRAG: question answering over 40 ADGM rulebooks with exact passage citations, refusals, a LangGraph pipeline on Gemini, and an evaluation on the ObliQA dataset's own labels.">
+<meta property="og:image" content="https://www.rachidahsoune.site/case-studies/regrag/assets/screens/answer-light.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="RegRAG — Cited answers from ADGM financial regulation | Case study">
+<meta name="twitter:description" content="How I built RegRAG: question answering over 40 ADGM rulebooks with exact passage citations, refusals, a LangGraph pipeline on Gemini, and an evaluation on the ObliQA dataset's own labels.">
+<meta name="twitter:image" content="https://www.rachidahsoune.site/case-studies/regrag/assets/screens/answer-light.jpg">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#fcfcfb; --surface:#ffffff; --surface-2:#f3f4f2; --border:#e4e4df;
+  --ink:#0f1417; --ink-2:#4b5357; --ink-3:#7c8589;
+  --brand:#4a7785; --brand-deep:#2f5562; --brand-soft:#e7f0f2;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+  --good:#0ca30c; --critical:#d03b3b;
+  --mono-logo:#0f1417;
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg:#111416; --surface:#171b1e; --surface-2:#1f2427; --border:#2c3337;
+    --ink:#eef1f2; --ink-2:#b9c2c6; --ink-3:#8a9499;
+    --brand:#6fa3b2; --brand-deep:#4a7785; --brand-soft:#1b2a30;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --mono-logo:#eef1f2;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--surface-2);padding:.12em .4em;border-radius:5px}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+.wide{max-width:1120px;margin:0 auto;padding:0 24px}
+
+/* hero */
+.hero{background:linear-gradient(135deg,#4a7785 0%,#2f5562 100%);color:#fff;padding:56px 0 64px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.hero .brand{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.hero .brand svg.secdojo{height:30px;width:auto}
+.hero .brand .sep{width:1px;height:22px;background:rgba(255,255,255,.5)}
+.hero .brand span{font-size:14px;letter-spacing:.08em;text-transform:uppercase;opacity:.9}
+.hero h1{font-size:42px;line-height:1.15;margin:0 0 16px;letter-spacing:-.01em;max-width:820px}
+.hero p.lede{font-size:19px;opacity:.92;max-width:740px;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:28px;margin-top:30px;font-size:14px}
+.meta div b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;font-weight:600}
+.stackrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.stackrow .chip{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);padding:5px 11px;border-radius:999px;font-size:13px}
+.stackrow .chip svg{width:15px;height:15px;fill:#fff}
+
+/* toc */
+.toc{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.toc .wide{display:flex;gap:4px;overflow-x:auto;padding-top:10px;padding-bottom:10px;scrollbar-width:none}
+.toc a{white-space:nowrap;font-size:13.5px;color:var(--ink-2);text-decoration:none;padding:6px 12px;border-radius:999px}
+.toc a.active,.toc a:hover{background:var(--brand-soft);color:var(--brand-deep)}
+@media (prefers-color-scheme: dark){.toc a.active,.toc a:hover{color:var(--brand)}}
+
+/* sections */
+section{padding:64px 0 8px}
+.kicker{font-size:12.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+h2{font-size:31px;line-height:1.2;margin:6px 0 14px;letter-spacing:-.01em}
+h3{font-size:20px;margin:36px 0 10px}
+p{margin:0 0 16px;color:var(--ink)}
+.muted{color:var(--ink-2)}
+.small{font-size:14px;color:var(--ink-3)}
+ul.clean{padding-left:20px;margin:0 0 16px}
+ul.clean li{margin:6px 0}
+
+.tldr{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 28px;margin-top:-36px;position:relative;z-index:2;box-shadow:0 10px 30px rgba(0,0,0,.06)}
+.tldr h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);margin:0 0 10px}
+.tldr ul{margin:0;padding-left:20px}
+.tldr li{margin:6px 0}
+
+.quote{border-left:4px solid var(--brand);padding:6px 0 6px 20px;margin:24px 0;font-size:19px;color:var(--ink-2);font-style:italic}
+
+.cards.two{grid-template-columns:repeat(2,1fr)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:18px 0}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+.card h4{margin:0 0 6px;font-size:16px;display:flex;align-items:center;gap:9px}
+.card h4 svg{width:20px;height:20px;flex:none}
+.card p{margin:0;font-size:15px;color:var(--ink-2)}
+.card .why{display:block;margin-top:8px;font-size:13.5px;color:var(--ink-3)}
+
+figure{margin:26px 0}
+figcaption{font-size:13.5px;color:var(--ink-3);margin-top:10px;text-align:center}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:1.4fr 1fr;gap:14px}
+.gallery img{width:100%;display:block;border-radius:10px;border:1px solid var(--border);cursor:zoom-in;transition:transform .25s}
+.gallery img:hover{transform:translateY(-2px)}
+.gallery .col{display:grid;gap:14px}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;z-index:50;padding:24px;cursor:zoom-out}
+.lightbox.open{display:flex}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px}
+
+/* before/after */
+.ba{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ba .card{padding:20px}
+.ba .flowline{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px;margin-top:10px}
+.ba .flowline span{background:var(--surface-2);border:1px solid var(--border);padding:4px 10px;border-radius:8px}
+.ba .flowline i{font-style:normal;color:var(--ink-3)}
+.ba .bad h4{color:var(--critical)} .ba .good h4{color:var(--good)}
+
+/* svg diagrams */
+svg text{font-family:inherit}
+.node rect{fill:var(--surface);stroke:var(--border);stroke-width:1.5}
+.node.hl rect{fill:var(--brand-soft);stroke:var(--brand);stroke-width:2}
+.node .t{font-size:14px;font-weight:700;fill:var(--ink)}
+.node .s{font-size:11.5px;fill:var(--ink-2)}
+.edge{fill:none;stroke:var(--ink-3);stroke-width:1.8;stroke-dasharray:var(--len);stroke-dashoffset:var(--len);transition:stroke-dashoffset 1.1s ease}
+.edge.green{stroke:var(--s3)} .edge.blue{stroke:var(--s1)}
+.elabel{font-size:11.5px;fill:var(--ink-3);opacity:0;transition:opacity .6s .9s}
+.anim .node{opacity:0;transform:translateY(8px);transition:opacity .5s,transform .5s}
+.anim.in .node{opacity:1;transform:none}
+.anim.in .edge{stroke-dashoffset:0}
+.anim.in .elabel{opacity:1}
+.mono{fill:var(--mono-logo)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:10px;counter-reset:st;margin:16px 0}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;font-size:14px;opacity:0;transform:translateY(10px);transition:opacity .45s,transform .45s}
+.in .step{opacity:1;transform:none}
+.step::before{counter-increment:st;content:counter(st);position:absolute;top:-10px;left:12px;background:var(--brand);color:#fff;font-size:11.5px;font-weight:700;width:22px;height:22px;border-radius:50%;display:grid;place-items:center}
+.step b{display:block;font-size:14.5px;margin:4px 0 2px}
+.step span{color:var(--ink-2)}
+.step svg.lg{width:22px;height:22px;margin-top:6px}
+
+/* funnel */
+.funnel{display:grid;gap:8px;margin:14px 0}
+.fbar{height:42px;border-radius:0 8px 8px 0;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:#fff;font-size:14px;font-weight:600;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.fbar small{font-weight:400;opacity:.9}
+
+/* charts */
+.chart{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin:22px 0}
+.chart h4{margin:0 0 4px;font-size:16px}
+.chart .sub{font-size:13.5px;color:var(--ink-3);margin-bottom:14px}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--ink-2);margin-bottom:12px;flex-wrap:wrap}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hbar{display:grid;grid-template-columns:190px 1fr 56px;align-items:center;gap:12px;margin:9px 0;font-size:14px}
+.hbar .lab{text-align:right;color:var(--ink-2)}
+.hbar .track{height:20px;display:flex;gap:2px;background:transparent}
+.hbar .seg{height:100%;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.hbar .seg:last-child{border-radius:0 4px 4px 0}
+.hbar .val{font-variant-numeric:tabular-nums;font-weight:700}
+.vbars{display:flex;align-items:flex-end;gap:26px;height:220px;padding:0 6px;border-bottom:1px solid var(--border);margin-top:8px}
+.vgroup{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.vgroup .pair{display:flex;gap:4px;align-items:flex-end;height:100%;width:100%;justify-content:center}
+.vgroup .col{width:34%;max-width:44px;height:0;border-radius:4px 4px 0 0;position:relative;transition:height 1s cubic-bezier(.2,.7,.2,1)}
+.vgroup .col span{position:absolute;top:-22px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;color:var(--ink);white-space:nowrap}
+.vlabels{display:flex;gap:26px;padding:0 6px}
+.vlabels div{flex:1;text-align:center;font-size:13px;color:var(--ink-2);padding-top:8px}
+.vlabels div.pick{color:var(--brand);font-weight:700}
+.tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 11px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.14);opacity:0;transition:opacity .12s;z-index:60;max-width:300px}
+details{margin-top:12px}
+details summary{cursor:pointer;font-size:13px;color:var(--ink-3)}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+
+/* metrics */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:20px 0}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.metric .v{font-size:34px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.05;color:var(--brand-deep)}
+@media (prefers-color-scheme: dark){.metric .v{color:var(--brand)}}
+.metric .v small{font-size:16px;color:var(--ink-3);font-weight:700}
+.metric .l{font-size:13.5px;color:var(--ink-2);margin-top:6px}
+
+/* layers */
+.layers{display:grid;gap:10px;margin:18px 0}
+.layer{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;opacity:0;transform:translateX(-12px);transition:opacity .5s,transform .5s}
+.in .layer{opacity:1;transform:none}
+.layer .n{width:44px;height:44px;border-radius:12px;background:var(--brand-soft);color:var(--brand-deep);display:grid;place-items:center;font-weight:800}
+@media (prefers-color-scheme: dark){.layer .n{color:var(--brand)}}
+.layer h4{margin:0 0 3px;font-size:15.5px}
+.layer p{margin:0;font-size:14.5px;color:var(--ink-2)}
+
+.artifacts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.artifact{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-decoration:none;color:inherit}
+.artifact:hover{border-color:var(--brand)}
+.artifact .ic{width:36px;height:36px;border-radius:10px;background:var(--brand-soft);display:grid;place-items:center;flex:none;font-size:18px}
+.artifact b{display:block;font-size:14.5px}
+.artifact span{font-size:13px;color:var(--ink-2)}
+
+footer{padding:56px 0 48px;color:var(--ink-3);font-size:13.5px;text-align:center}
+@media (max-width:760px){.cards.two{grid-template-columns:1fr}
+  .hero h1{font-size:31px}.gallery,.ba{grid-template-columns:1fr}.hbar{grid-template-columns:120px 1fr 48px}h2{font-size:26px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{transition:none!important;animation:none!important}
+  .anim .node,.step,.layer{opacity:1;transform:none}.edge{stroke-dashoffset:0}.elabel{opacity:1}
+}
+
+/* RegRAG additions */
+.hero .brand .mark{width:34px;height:34px;border-radius:10px;background:#fff;color:#2f5562;display:grid;place-items:center;font-weight:800;font-size:19px}
+.hero .brand b{font-size:18px;letter-spacing:.01em}
+.pending{font-size:15px!important;font-weight:700;color:var(--ink-3)!important;letter-spacing:0}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--ink-3);border:1px solid var(--border);vertical-align:2px;margin-left:6px}
+.badge.final{background:var(--brand-soft);color:var(--brand-deep);border-color:transparent}
+.notice{border:1px dashed var(--border);border-radius:var(--radius);padding:14px 16px;font-size:14.5px;color:var(--ink-2);margin:18px 0}
+.vgroup.three .col{width:24%}
+.hbar.stack .track{background:var(--surface-2);border-radius:4px;overflow:hidden}
+.gallery.shots.two{grid-template-columns:1fr 1fr}
+.gallery.shots.three-up{grid-template-columns:1fr 1fr 1fr}
+.gallery.shots img{aspect-ratio:16/11;object-fit:cover;object-position:top}
+@media (max-width:760px){.gallery.shots.two,.gallery.shots.three-up{grid-template-columns:1fr}}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0 18px;font-size:14px}
+.flow span{background:var(--surface);border:1px solid var(--border);padding:5px 11px;border-radius:999px}
+.flow span.hl{background:var(--brand-soft);border-color:transparent;color:var(--brand-deep);font-weight:600}
+.flow i{font-style:normal;color:var(--ink-3)}
+@media (prefers-color-scheme: dark){.flow span.hl,.badge.final{color:var(--brand)}}
+</style>
+</head>
+<body>
+<!-- portfolio: back link -->
+<style>.cs-back{position:fixed;top:12px;left:12px;z-index:45;display:inline-block;padding:6px 12px;font:500 14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;color:#111827;background:rgba(255,255,255,.92);border:1px solid rgba(0,0,0,.12);border-radius:999px;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.08);backdrop-filter:blur(6px)}.cs-back:hover,.cs-back:focus-visible{background:#fff;text-decoration:underline}@media (prefers-color-scheme: dark){.cs-back{color:#f3f4f6;background:rgba(17,20,22,.9);border-color:rgba(255,255,255,.18)}.cs-back:hover,.cs-back:focus-visible{background:#111416}}</style>
+<a class="cs-back" href="/case-studies/">&larr; All case studies</a>
+<script>/* portfolio: keep the back link clear of the sticky table of contents */document.addEventListener("DOMContentLoaded",function(){var b=document.querySelector(".cs-back"),t=document.querySelector(".toc");if(!b||!t)return;function u(){b.style.top=t.getBoundingClientRect().top<=0?(t.offsetHeight+10)+"px":""}addEventListener("scroll",u,{passive:true});addEventListener("resize",u);u()});</script>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="i-typescript" viewBox="0 0 24 24"><path d="M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0zm17.363 9.75c.612 0 1.154.037 1.627.111a6.38 6.38 0 0 1 1.306.34v2.458a3.95 3.95 0 0 0-.643-.361 5.093 5.093 0 0 0-.717-.26 5.453 5.453 0 0 0-1.426-.2c-.3 0-.573.028-.819.086a2.1 2.1 0 0 0-.623.242c-.17.104-.3.229-.393.374a.888.888 0 0 0-.14.49c0 .196.053.373.156.529.104.156.252.304.443.444s.423.276.696.41c.273.135.582.274.926.416.47.197.892.407 1.266.628.374.222.695.473.963.753.268.279.472.598.614.957.142.359.214.776.214 1.253 0 .657-.125 1.21-.373 1.656a3.033 3.033 0 0 1-1.012 1.085 4.38 4.38 0 0 1-1.487.596c-.566.12-1.163.18-1.79.18a9.916 9.916 0 0 1-1.84-.164 5.544 5.544 0 0 1-1.512-.493v-2.63a5.033 5.033 0 0 0 3.237 1.2c.333 0 .624-.03.872-.09.249-.06.456-.144.623-.25.166-.108.29-.234.373-.38a1.023 1.023 0 0 0-.074-1.089 2.12 2.12 0 0 0-.537-.5 5.597 5.597 0 0 0-.807-.444 27.72 27.72 0 0 0-1.007-.436c-.918-.383-1.602-.852-2.053-1.405-.45-.553-.676-1.222-.676-2.005 0-.614.123-1.141.369-1.582.246-.441.58-.804 1.004-1.089a4.494 4.494 0 0 1 1.47-.629 7.536 7.536 0 0 1 1.77-.201zm-15.113.188h9.563v2.166H9.506v9.646H6.789v-9.646H3.375z"/></symbol><symbol id="i-celery" viewBox="0 0 24 24"><path d="M2.303 0A2.298 2.298 0 0 0 0 2.303v19.394A2.298 2.298 0 0 0 2.303 24h19.394A2.298 2.298 0 0 0 24 21.697V2.303A2.298 2.298 0 0 0 21.697 0zm8.177 3.072c4.098 0 7.028 1.438 7.68 1.764l-1.194 2.55c-2.442-1.057-4.993-1.41-5.672-1.41-1.574 0-2.17.922-2.17 1.763v8.494c0 .869.596 1.791 2.17 1.791.679 0 3.23-.38 5.672-1.41l1.194 2.496c-.435.271-3.637 1.818-7.68 1.818-1.112 0-4.64-.244-4.64-4.64V7.713c0-4.397 3.528-4.64 4.64-4.64z"/></symbol><symbol id="i-docker" viewBox="0 0 24 24"><path d="M13.983 11.078h2.119a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.119a.185.185 0 00-.185.185v1.888c0 .102.083.185.185.185m-2.954-5.43h2.118a.186.186 0 00.186-.186V3.574a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m0 2.716h2.118a.187.187 0 00.186-.186V6.29a.186.186 0 00-.186-.185h-2.118a.185.185 0 00-.185.185v1.887c0 .102.082.185.185.186m-2.93 0h2.12a.186.186 0 00.184-.186V6.29a.185.185 0 00-.185-.185H8.1a.185.185 0 00-.185.185v1.887c0 .102.083.185.185.186m-2.964 0h2.119a.186.186 0 00.185-.186V6.29a.185.185 0 00-.185-.185H5.136a.186.186 0 00-.186.185v1.887c0 .102.084.185.186.186m5.893 2.715h2.118a.186.186 0 00.186-.185V9.006a.186.186 0 00-.186-.186h-2.118a.185.185 0 00-.185.185v1.888c0 .102.082.185.185.185m-2.93 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.083.185.185.185m-2.964 0h2.119a.185.185 0 00.185-.185V9.006a.185.185 0 00-.184-.186h-2.12a.186.186 0 00-.186.186v1.887c0 .102.084.185.186.185m-2.92 0h2.12a.185.185 0 00.184-.185V9.006a.185.185 0 00-.184-.186h-2.12a.185.185 0 00-.184.185v1.888c0 .102.082.185.185.185M23.763 9.89c-.065-.051-.672-.51-1.954-.51-.338.001-.676.03-1.01.087-.248-1.7-1.653-2.53-1.716-2.566l-.344-.199-.226.327c-.284.438-.49.922-.612 1.43-.23.97-.09 1.882.403 2.661-.595.332-1.55.413-1.744.42H.751a.751.751 0 00-.75.748 11.376 11.376 0 00.692 4.062c.545 1.428 1.355 2.48 2.41 3.124 1.18.723 3.1 1.137 5.275 1.137.983.003 1.963-.086 2.93-.266a12.248 12.248 0 003.823-1.389c.98-.567 1.86-1.288 2.61-2.136 1.252-1.418 1.998-2.997 2.553-4.4h.221c1.372 0 2.215-.549 2.68-1.009.309-.293.55-.65.707-1.046l.098-.288Z"/></symbol><symbol id="i-elastic" viewBox="0 0 24 24"><path d="M20.345 16.33l-3.959-.926-1.05-2.01 5.177-4.535a3.962 3.962 0 012.559 3.702 4.006 4.006 0 01-2.727 3.77m-2.976 4.68c-.616 0-1.22-.207-1.714-.587l.782-4.077 3.596.841c.115.31.172.642.172.987a2.839 2.839 0 01-2.836 2.836m-2.637-.586a5.92 5.92 0 01-4.908 2.6A5.947 5.947 0 014 15.905l5.167-4.67 5.272 2.403 1.167 2.23zM.928 11.443a4.007 4.007 0 012.726-3.77l3.95.933.927 1.98-5.05 4.565a3.97 3.97 0 01-2.553-3.708m5.703-8.45a2.841 2.841 0 011.723.58l-.789 4.092-3.598-.85a2.842 2.842 0 01-.172-.986A2.84 2.84 0 016.63 2.992m2.66.59A5.92 5.92 0 0120.1 6.93c0 .4-.038.781-.114 1.164l-5.299 4.643-5.251-2.394-1.026-2.19zM24 12.571a4.723 4.723 0 00-3.124-4.454 6.695 6.695 0 00.126-1.29A6.789 6.789 0 0014.22.047 6.769 6.769 0 008.727 2.86a3.586 3.586 0 00-2.204-.754A3.604 3.604 0 003.15 6.959 4.786 4.786 0 000 11.431 4.727 4.727 0 003.139 15.9a6.876 6.876 0 00-.124 1.289 6.773 6.773 0 006.765 6.765c2.19 0 4.22-1.052 5.49-2.824a3.568 3.568 0 002.207.769 3.603 3.603 0 003.374-4.854A4.785 4.785 0 0024 12.572"/></symbol><symbol id="i-fastapi" viewBox="0 0 24 24"><path d="M12 .0387C5.3729.0384.0003 5.3931 0 11.9988c-.001 6.6066 5.372 11.9628 12 11.9625 6.628.0003 12.001-5.3559 12-11.9625-.0003-6.6057-5.3729-11.9604-12-11.96m-.829 5.4153h7.55l-7.5805 5.3284h5.1828L5.279 18.5436q2.9466-6.5444 5.892-13.0896"/></symbol><symbol id="i-gitlab" viewBox="0 0 24 24"><path d="m23.6004 9.5927-.0337-.0862L20.3.9814a.851.851 0 0 0-.3362-.405.8748.8748 0 0 0-.9997.0539.8748.8748 0 0 0-.29.4399l-2.2055 6.748H7.5375l-2.2057-6.748a.8573.8573 0 0 0-.29-.4412.8748.8748 0 0 0-.9997-.0537.8585.8585 0 0 0-.3362.4049L.4332 9.5015l-.0325.0862a6.0657 6.0657 0 0 0 2.0119 7.0105l.0113.0087.03.0213 4.976 3.7264 2.462 1.8633 1.4995 1.1321a1.0085 1.0085 0 0 0 1.2197 0l1.4995-1.1321 2.4619-1.8633 5.006-3.7489.0125-.01a6.0682 6.0682 0 0 0 2.0094-7.003z"/></symbol><symbol id="i-googlegemini" viewBox="0 0 24 24"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></symbol><symbol id="i-laravel" viewBox="0 0 24 24"><path d="M23.642 5.43a.364.364 0 01.014.1v5.149c0 .135-.073.26-.189.326l-4.323 2.49v4.934a.378.378 0 01-.188.326L9.93 23.949a.316.316 0 01-.066.027c-.008.002-.016.008-.024.01a.348.348 0 01-.192 0c-.011-.002-.02-.008-.03-.012-.02-.008-.042-.014-.062-.025L.533 18.755a.376.376 0 01-.189-.326V2.974c0-.033.005-.066.014-.098.003-.012.01-.02.014-.032a.369.369 0 01.023-.058c.004-.013.015-.022.023-.033l.033-.045c.012-.01.025-.018.037-.027.014-.012.027-.024.041-.034H.53L5.043.05a.375.375 0 01.375 0L9.93 2.647h.002c.015.01.027.021.04.033l.038.027c.013.014.02.03.033.045.008.011.02.021.025.033.01.02.017.038.024.058.003.011.01.021.013.032.01.031.014.064.014.098v9.652l3.76-2.164V5.527c0-.033.004-.066.013-.098.003-.01.01-.02.013-.032a.487.487 0 01.024-.059c.007-.012.018-.02.025-.033.012-.015.021-.03.033-.043.012-.012.025-.02.037-.028.014-.01.026-.023.041-.032h.001l4.513-2.598a.375.375 0 01.375 0l4.513 2.598c.016.01.027.021.042.031.012.01.025.018.036.028.013.014.022.03.034.044.008.012.019.021.024.033.011.02.018.04.024.06.006.01.012.021.015.032zm-.74 5.032V6.179l-1.578.908-2.182 1.256v4.283zm-4.51 7.75v-4.287l-2.147 1.225-6.126 3.498v4.325zM1.093 3.624v14.588l8.273 4.761v-4.325l-4.322-2.445-.002-.003H5.04c-.014-.01-.025-.021-.04-.031-.011-.01-.024-.018-.035-.027l-.001-.002c-.013-.012-.021-.025-.031-.04-.01-.011-.021-.022-.028-.036h-.002c-.008-.014-.013-.031-.02-.047-.006-.016-.014-.027-.018-.043a.49.49 0 01-.008-.057c-.002-.014-.006-.027-.006-.041V5.789l-2.18-1.257zM5.23.81L1.47 2.974l3.76 2.164 3.758-2.164zm1.956 13.505l2.182-1.256V3.624l-1.58.91-2.182 1.255v9.435zm11.581-10.95l-3.76 2.163 3.76 2.163 3.759-2.164zm-.376 4.978L16.21 7.087 14.63 6.18v4.283l2.182 1.256 1.58.908zm-8.65 9.654l5.514-3.148 2.756-1.572-3.757-2.163-4.323 2.489-3.941 2.27z"/></symbol><symbol id="i-mysql" viewBox="0 0 24 24"><path d="M16.405 5.501c-.115 0-.193.014-.274.033v.013h.014c.054.104.146.18.214.273.054.107.1.214.154.32l.014-.015c.094-.066.14-.172.14-.333-.04-.047-.046-.094-.08-.14-.04-.067-.126-.1-.18-.153zM5.77 18.695h-.927a50.854 50.854 0 00-.27-4.41h-.008l-1.41 4.41H2.45l-1.4-4.41h-.01a72.892 72.892 0 00-.195 4.41H0c.055-1.966.192-3.81.41-5.53h1.15l1.335 4.064h.008l1.347-4.064h1.095c.242 2.015.384 3.86.428 5.53zm4.017-4.08c-.378 2.045-.876 3.533-1.492 4.46-.482.716-1.01 1.073-1.583 1.073-.153 0-.34-.046-.566-.138v-.494c.11.017.24.026.386.026.268 0 .483-.075.647-.222.197-.18.295-.382.295-.605 0-.155-.077-.47-.23-.944L6.23 14.615h.91l.727 2.36c.164.536.233.91.205 1.123.4-1.064.678-2.227.835-3.483zm12.325 4.08h-2.63v-5.53h.885v4.85h1.745zm-3.32.135l-1.016-.5c.09-.076.177-.158.255-.25.433-.506.648-1.258.648-2.253 0-1.83-.718-2.746-2.155-2.746-.704 0-1.254.232-1.65.697-.43.508-.646 1.256-.646 2.245 0 .972.19 1.686.574 2.14.35.41.877.615 1.583.615.264 0 .506-.033.725-.098l1.325.772.36-.622zM15.5 17.588c-.225-.36-.337-.94-.337-1.736 0-1.393.424-2.09 1.27-2.09.443 0 .77.167.977.5.224.362.336.936.336 1.723 0 1.404-.424 2.108-1.27 2.108-.445 0-.77-.167-.978-.5zm-1.658-.425c0 .47-.172.856-.516 1.156-.344.3-.803.45-1.384.45-.543 0-1.064-.172-1.573-.515l.237-.476c.438.22.833.328 1.19.328.332 0 .593-.073.783-.22a.754.754 0 00.3-.615c0-.33-.23-.61-.648-.845-.388-.213-1.163-.657-1.163-.657-.422-.307-.632-.636-.632-1.177 0-.45.157-.81.47-1.085.315-.278.72-.415 1.22-.415.512 0 .98.136 1.4.41l-.213.476a2.726 2.726 0 00-1.064-.23c-.283 0-.502.068-.654.206a.685.685 0 00-.248.524c0 .328.234.61.666.85.393.215 1.187.67 1.187.67.433.305.648.63.648 1.168zm9.382-5.852c-.535-.014-.95.04-1.297.188-.1.04-.26.04-.274.167.055.053.063.14.11.214.08.134.218.313.346.407.14.11.28.216.427.31.26.16.555.255.81.416.145.094.293.213.44.313.073.05.12.14.214.172v-.02c-.046-.06-.06-.147-.105-.214-.067-.067-.134-.127-.2-.193a3.223 3.223 0 00-.695-.675c-.214-.146-.682-.35-.77-.595l-.013-.014c.146-.013.32-.066.46-.106.227-.06.435-.047.67-.106.106-.027.213-.06.32-.094v-.06c-.12-.12-.21-.283-.334-.395a8.867 8.867 0 00-1.104-.823c-.21-.134-.476-.22-.697-.334-.08-.04-.214-.06-.26-.127-.12-.146-.19-.34-.275-.514a17.69 17.69 0 01-.547-1.163c-.12-.262-.193-.523-.34-.763-.69-1.137-1.437-1.826-2.586-2.5-.247-.14-.543-.2-.856-.274-.167-.008-.334-.02-.5-.027-.11-.047-.216-.174-.31-.235-.38-.24-1.364-.76-1.644-.072-.18.434.267.862.422 1.082.115.153.26.328.34.5.047.116.06.235.107.356.106.294.207.622.347.897.073.14.153.287.247.413.054.073.146.107.167.227-.094.136-.1.334-.154.5-.24.757-.146 1.693.194 2.25.107.166.362.534.703.393.3-.12.234-.5.32-.835.02-.08.007-.133.048-.187v.015c.094.188.188.367.274.555.206.328.566.668.867.895.16.12.287.328.487.402v-.02h-.015c-.043-.058-.1-.086-.154-.133a3.445 3.445 0 01-.35-.4 8.76 8.76 0 01-.747-1.218c-.11-.21-.202-.436-.29-.643-.04-.08-.04-.2-.107-.24-.1.146-.247.273-.32.453-.127.288-.14.642-.188 1.01-.027.007-.014 0-.027.014-.214-.052-.287-.274-.367-.46-.2-.475-.233-1.238-.06-1.785.047-.14.247-.582.167-.716-.042-.127-.174-.2-.247-.303a2.478 2.478 0 01-.24-.427c-.16-.374-.24-.788-.414-1.162-.08-.173-.22-.354-.334-.513-.127-.18-.267-.307-.368-.52-.033-.073-.08-.194-.027-.274.014-.054.042-.075.094-.09.088-.072.335.022.422.062.247.1.455.194.662.334.094.066.195.193.315.226h.14c.214.047.455.014.655.073.355.114.675.28.962.46a5.953 5.953 0 012.085 2.286c.08.154.115.295.188.455.14.33.313.663.455.982.14.315.275.636.476.897.1.14.502.213.682.286.133.06.34.115.46.188.23.14.454.3.67.454.11.076.443.243.463.378z"/></symbol><symbol id="i-openai" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z"/></symbol><symbol id="i-pydantic" viewBox="0 0 24 24"><path d="m23.826 17.316-4.23-5.866-6.847-9.496c-.348-.48-1.151-.48-1.497 0l-6.845 9.494-4.233 5.868a.925.925 0 0 0 .46 1.417l11.078 3.626h.002a.92.92 0 0 0 .572 0h.002l11.077-3.626c.28-.092.5-.31.59-.592a.916.916 0 0 0-.13-.825h.002ZM12.001 4.07l4.44 6.158-4.152-1.36c-.032-.01-.066-.008-.098-.016a.8.8 0 0 0-.096-.016c-.032-.004-.062-.016-.094-.016s-.062.012-.094.016a.74.74 0 0 0-.096.016c-.032.006-.066.006-.096.016L7.59 10.221l-.026.008 4.44-6.158h-.002Zm-6.273 8.7 4.834-1.583.516-.168v9.19L2.41 17.372l3.317-4.6Zm7.197 7.437V11.02l5.35 1.752 3.316 4.598-8.666 2.838Z"/></symbol><symbol id="i-python" viewBox="0 0 24 24"><path d="M11.858 0c-.978.005-1.913.088-2.736.234C6.7.662 6.26 1.558 6.26 3.21v2.182h5.725v.727H4.111c-1.664 0-3.121 1-3.577 2.903-.526 2.181-.549 3.542 0 5.82.407 1.694 1.379 2.902 3.043 2.902h1.969v-2.616c0-1.89 1.635-3.557 3.576-3.557h5.72c1.591 0 2.862-1.31 2.862-2.91v-5.45c0-1.553-1.309-2.718-2.863-2.977A18 18 0 0 0 11.858 0M8.762 1.755c.591 0 1.074.491 1.074 1.095 0 .601-.483 1.087-1.074 1.087A1.08 1.08 0 0 1 7.688 2.85c0-.604.48-1.095 1.074-1.095m9.656 4.364v2.543c0 1.971-1.671 3.63-3.577 3.63H9.122c-1.566 0-2.862 1.34-2.862 2.91v5.452c0 1.551 1.349 2.464 2.862 2.91 1.813.532 3.55.628 5.72 0 1.44-.418 2.862-1.258 2.862-2.91V18.47h-5.719v-.727h8.582c1.664 0 2.284-1.16 2.862-2.903.598-1.793.573-3.518 0-5.819-.41-1.656-1.196-2.903-2.862-2.903zm-3.216 13.807a1.08 1.08 0 0 1 1.074 1.088c0 .604-.48 1.094-1.074 1.094-.592 0-1.075-.49-1.075-1.094 0-.601.483-1.088 1.075-1.088"/></symbol><symbol id="i-qdrant" viewBox="0 0 24 24"><path d="m12 16.5 3.897-2.25v-4.5L12 7.5 8.103 9.75v4.5zM1.607 18 12 24l3.897-2.25v-4.5L12 19.5l-6.495-3.75v-7.5L12 4.5l6.495 3.75v15L22.393 21V6L12 0 1.607 6Z"/></symbol><symbol id="i-rabbitmq" viewBox="0 0 24 24"><path d="M23.035 9.601h-7.677a.956.956 0 01-.962-.962V.962a.956.956 0 00-.962-.956H10.56a.956.956 0 00-.962.956V8.64a.956.956 0 01-.962.962H5.762a.956.956 0 01-.961-.962V.962A.956.956 0 003.839 0H.959a.956.956 0 00-.956.962v22.076A.956.956 0 00.965 24h22.07a.956.956 0 00.962-.962V10.58a.956.956 0 00-.962-.98zm-3.86 8.152a1.437 1.437 0 01-1.437 1.443h-1.924a1.437 1.437 0 01-1.436-1.443v-1.917a1.437 1.437 0 011.436-1.443h1.924a1.437 1.437 0 011.437 1.443z"/></symbol><symbol id="i-sqlalchemy" viewBox="0 0 24 24"><path d="M11.8 15.955a44.068 44.068 0 0 1-1.673-.691c-1.736-.757-1.981-.772-2.499-.143-.119.146-.25.236-.287.2-.111-.111.219-.644.617-.993.325-.285.433-.325.791-.285.228.025.985.29 1.682.586 1.573.669 2.034.811 2.635.811.731 0 1.106-.512.876-1.192-.057-.171-.04-.228.074-.228.213 0 .322.797.168 1.255a1.617 1.617 0 0 1-.424.614c-.251.211-.41.257-.879.254a3.853 3.853 0 0 1-1.082-.188h.001Zm.301-2.225c0-.048.179-.134.401-.188l.401-.099.086-1.446c.094-1.599.025-3.172-.148-3.383-.063-.074-.253-.165-.427-.205-.705-.156-.236-.264 1.133-.264 1.368 0 1.803.099 1.152.264-.561.14-.564.148-.564 2.43 0 1.266.046 2.22.111 2.342.092.171.228.207.752.207 1.081 0 1.453-.255 1.747-1.203.088-.284.315-.233.236.054-.037.134-.097.54-.134.91l-.068.669H14.44c-1.286 0-2.339-.04-2.339-.088Zm5.312-.068c0-.086.083-.171.219-.236.183-.086.302-.265.734-1.11.686-1.337 1.767-3.634 1.87-3.978.079-.262.097-.276.392-.31.171-.02.313-.031.316-.025l.527 1.152c.284.628.856 1.824 1.271 2.654.695 1.397.772 1.523 1.005 1.636.142.069.253.174.253.237 0 .099-.122.111-1.175.111-1.056 0-1.175-.012-1.175-.114 0-.068.091-.142.236-.191.134-.043.236-.122.236-.182 0-.057-.139-.432-.31-.834l-.31-.731h-2.35l-.225.495c-.421.928-.43 1.147-.037 1.252.196.054.25.097.227.185-.025.103-.127.117-.867.117-.794.006-.837 0-.837-.128Zm-15.652.025a10.933 10.933 0 0 1-.808-.196l-.549-.154.282-.518.281-.518-.227-.281c-.322-.399-.737-1.272-.74-1.554-.003-.657.851-1.61 1.898-2.122.72-.353 1.291-.362 2.009-.026l.54.253.157-.224c.085-.123.156-.285.156-.356 0-.071.071-.134.157-.134.085 0 .156.023.156.048 0 .063-.629 1.651-.669 1.691-.017.016-.187-.063-.381-.177-.546-.321-1.232-.535-1.764-.549-1.238-.031-1.667 1.178-.794 2.236l.308.373.839-.68c.942-.76 1.05-.777 1.784-.27.825.569.839 1.434.042 2.339-.705.805-1.431 1.027-2.677.819Zm5.984-.165c-.646-.301-1.229-.876-1.565-1.547-.538-1.076-.373-1.765.646-2.695.856-.782 1.556-1.087 2.498-1.087.68 0 .825.037 1.266.307 1.044.646 1.303 1.878.675 3.221-.737 1.577-2.294 2.37-3.52 1.801Zm-3.872-.702c.409-.322.381-.917-.063-1.389-.558-.592-.731-.566-1.713.253-.976.814-.982.783.185 1.155.771.251 1.255.242 1.591-.019Zm6.034-.046c.484-.239.817-1.343.68-2.259-.17-1.13-1.698-1.901-2.819-1.423-1.153.493-1.17 1.804-.037 2.985.791.828 1.471 1.044 2.176.697Zm11.359-1.414c.04-.071-.845-2.003-.928-2.023-.06-.017-.976 1.872-.976 2.014 0 .072 1.861.08 1.904.009Z"/></symbol></svg>
+
+<header class="hero">
+  <div class="wide">
+    <div class="brand"><span class="mark" aria-hidden="true">§</span><b>RegRAG</b><div class="sep"></div><span>AI case study</span></div>
+    <h1>RegRAG: cited answers from ADGM financial regulation, and a refusal when the rulebooks are silent</h1>
+    <p class="lede">Compliance questions need an exact source, not a plausible paragraph. I built a question-answering system over the 40 rulebooks and guidance documents of Abu Dhabi Global Market that cites the passage behind every claim, refuses what the corpus cannot answer, and is measured on the dataset's own labels.</p>
+    <div class="meta">
+      <div><b>Role</b>AI engineer (solo)</div>
+      <div><b>Timeline</b>November 2026</div>
+      <div><b>Data</b>ObliQA · 40 ADGM documents</div>
+      <div><b>Code</b><a href="https://github.com/Rachid09/RegRag" style="color:#fff">github.com/Rachid09/RegRag</a></div>
+    </div>
+    <div class="stackrow">
+      <span class="chip"><svg><use href="#i-python"/></svg>Python</span>
+      <span class="chip"><svg><use href="#i-fastapi"/></svg>FastAPI</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="19" cy="18" r="3"/><path d="M7.6 11 16.4 7M7.6 13l8.8 4" stroke="#fff" stroke-width="2"/></svg>LangGraph</span>
+      <span class="chip"><svg><use href="#i-googlegemini"/></svg>Gemini · LiteLLM</span>
+      <span class="chip"><svg><use href="#i-qdrant"/></svg>Qdrant</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="4"/></svg>Ollama</span>
+      <span class="chip"><svg><use href="#i-docker"/></svg>Docker</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tldr">
+    <h2>TL;DR</h2>
+    <ul>
+      <li><b>Problem:</b> ADGM's rules are spread over 40 rulebooks, regulations and guidance notes (12,988 passages). A compliance answer is only useful if it points to the exact passage.</li>
+      <li><b>Solution:</b> RegRAG: BM25 retrieval, a LangGraph pipeline on Gemini that answers only from numbered passages, a verifier that drops invented citations, two refusal points, and a streaming chat app.</li>
+      <li id="tldrResults"><b>Results:</b> …</li>
+    </ul>
+  </div>
+</div>
+
+<nav class="toc" aria-label="Sections"><div class="wide">
+  <a href="#context">Context &amp; goal</a><a href="#product">The product</a><a href="#architecture">Architecture</a><a href="#retrieval">How retrieval works</a><a href="#guardrails">Guardrails</a><a href="#role">My role</a><a href="#results">Results</a>
+</div></nav>
+
+<main class="wrap">
+
+<!-- CONTEXT -->
+<section id="context">
+  <div class="kicker">01 · Context &amp; goal</div>
+  <h2>Regulation is long. Answers must be traceable.</h2>
+  <p>Abu Dhabi Global Market regulates financial firms through rulebooks (conduct of business, prudential, anti-money laundering, market rules…), regulations and guidance. A compliance officer's question, <i>when must a listed entity disclose inside information?</i>, usually has its answer in one or two passages buried among thousands.</p>
+  <p>The <a href="https://huggingface.co/datasets/RegNLP/ObliQA">ObliQA</a> dataset makes this measurable: 27,869 questions over the ADGM corpus, each labelled with the passages that answer it: an answer key, but no reference answers.</p>
+  <div class="ba">
+    <div class="card bad"><h4>Before</h4><p>Search the documents, read, cross-reference.</p>
+      <div class="flowline"><span>Question</span><i>→</i><span>40 PDFs</span><i>→</i><span>keyword search</span><i>→</i><span>read many passages</span></div></div>
+    <div class="card good"><h4>After</h4><p>An answer with its sources, or an honest “not covered”.</p>
+      <div class="flowline"><span>Question</span><i>→</i><span>RegRAG</span><i>→</i><span>answer + cited passages</span></div></div>
+  </div>
+  <h3>The goal</h3>
+  <ul class="clean">
+    <li><b>Grounded:</b> every claim cites a passage as (DocumentID, PassageID); an answer without a valid citation is not shown.</li>
+    <li><b>Honest:</b> questions the rulebooks do not cover are refused, not improvised.</li>
+    <li><b>Measured:</b> retrieval, citations, refusals and prompt-injection resistance are scored against the dataset's labels and hand-written test sets, reproducible with one command each.</li>
+    <li><b>About $0:</b> free-tier Gemini, a local embedding model when the free embedding quota ran out, and every model call cached so reruns are free.</li>
+  </ul>
+</section>
+
+<!-- PRODUCT -->
+<section id="product">
+  <div class="kicker">02 · The product</div>
+  <h2>A chat page that shows its sources</h2>
+  <p>Answers stream into a minimal chat page. Each <code>[n]</code> marker is a link to its source card: document title, passage number, section path and the passage text. Cited sources are highlighted, the rest dimmed. Off-topic questions get a clear refusal with no misleading sources.</p>
+  <div class="gallery shots two">
+    <img src="assets/screens/answer-light.jpg" alt="RegRAG answering a question about Rule 7.2.2 with one cited source highlighted (light theme)" loading="lazy">
+    <img src="assets/screens/answer-dark.jpg" alt="The same answer in dark theme" loading="lazy">
+  </div>
+  <div class="gallery shots three-up" style="margin-top:14px">
+    <img src="assets/screens/refusal-light.jpg" alt="RegRAG refusing a question about US SEC rules" loading="lazy">
+    <img src="assets/screens/empty-light.jpg" alt="Empty state with example questions from the test set" loading="lazy">
+    <img src="assets/screens/answer-mobile.jpg" alt="RegRAG on a phone-sized screen" loading="lazy">
+  </div>
+  <figcaption>Cited answer, refusal, mobile, empty state and dark theme, from the running app. Click to enlarge.</figcaption>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture">
+  <div class="kicker">03 · Architecture</div>
+  <h2>One container, one pipeline, every call cached</h2>
+  <p>The browser talks to a single FastAPI app. Each question runs through a LangGraph state machine that retrieves, decides whether to answer at all, generates with Gemini and verifies the citations before anything is streamed back. Ingestion runs offline and produces an in-memory BM25 index; dense embeddings and Qdrant were built for the comparison in section 04.</p>
+</section>
+</main>
+
+<div class="wide">
+<figure class="panel anim" id="archfig">
+<svg viewBox="0 0 1120 560" width="100%" role="img" aria-label="Architecture: browser chat page, FastAPI, LangGraph pipeline connected to Gemini, a SQLite cache and the BM25 index; ingestion from ObliQA through parsing and chunking into BM25, and embeddings into Qdrant for experiments">
+  <g class="edges">
+    <path class="edge" d="M170 268 H210"/>
+    <path class="edge blue" d="M390 268 H430"/>
+    <path class="edge" d="M660 232 C 780 210, 800 92, 900 92"/>
+    <path class="edge" d="M660 252 C 790 245, 800 182, 900 182"/>
+    <path class="edge" d="M660 272 H900"/>
+    <path class="edge" d="M190 476 H210"/>
+    <path class="edge green" d="M390 462 C 640 462, 780 300, 900 292"/>
+    <path class="edge" d="M390 488 H430"/>
+    <path class="edge green" d="M660 488 C 780 488, 800 452, 900 452" style="stroke-dasharray:6 5"/>
+  </g>
+  <g class="elabel">
+    <text x="800" y="380" text-anchor="start">build BM25 index</text>
+    <text x="780" y="520" text-anchor="middle">embed + upsert (experiments)</text>
+    <text x="410" y="250" text-anchor="middle">SSE</text>
+  </g>
+  <g class="node" style="transition-delay:0s"><rect x="20" y="232" width="150" height="72" rx="12"/>
+    <circle cx="48" cy="261" r="7" class="mono"/><path d="M36 282 q12 -14 24 0" class="mono"/>
+    <text class="t" x="70" y="264">User</text><text class="s" x="70" y="283">chat page</text></g>
+  <g class="node" style="transition-delay:.1s"><rect x="210" y="222" width="180" height="92" rx="12"/>
+    <use href="#i-fastapi" x="226" y="238" width="26" height="26" fill="#009688"/>
+    <text class="t" x="260" y="257">FastAPI</text><text class="s" x="226" y="282">/ask (SSE) · /health</text><text class="s" x="226" y="299">rate limit · CSP</text></g>
+  <g class="node hl" style="transition-delay:.2s"><rect x="430" y="180" width="230" height="176" rx="14"/>
+    <use href="#i-python" x="446" y="196" width="26" height="26" fill="#3776ab"/>
+    <text class="t" x="480" y="215">LangGraph pipeline</text>
+    <text class="s" x="446" y="248">guard → retrieve → gate</text>
+    <text class="s" x="446" y="268">→ generate → verify</text>
+    <text class="s" x="446" y="288">→ respond</text>
+    <text class="s" x="446" y="318">two refusal points</text>
+    <text class="s" x="446" y="336">citations checked before streaming</text></g>
+  <g class="node" style="transition-delay:.35s"><rect x="900" y="60" width="200" height="64" rx="12"/>
+    <use href="#i-googlegemini" x="916" y="79" width="26" height="26" fill="#8e75b2"/>
+    <text class="t" x="952" y="88">Gemini</text><text class="s" x="952" y="107">3.5 Flash-Lite · LiteLLM</text></g>
+  <g class="node" style="transition-delay:.45s"><rect x="900" y="150" width="200" height="64" rx="12"/>
+    <rect x="918" y="168" width="22" height="28" rx="5" class="mono" opacity=".85"/>
+    <text class="t" x="952" y="178">SQLite cache</text><text class="s" x="952" y="197">every model call</text></g>
+  <g class="node" style="transition-delay:.55s"><rect x="900" y="240" width="200" height="64" rx="12"/>
+    <text class="t" x="916" y="268">BM25 index</text><text class="s" x="916" y="287">in memory · 13,040 chunks</text></g>
+  <g class="node" style="transition-delay:.65s"><rect x="20" y="440" width="170" height="72" rx="12"/>
+    <text class="t" x="36" y="470">ObliQA</text><text class="s" x="36" y="489">pinned commits · SHA-256</text></g>
+  <g class="node" style="transition-delay:.75s"><rect x="210" y="440" width="180" height="72" rx="12"/>
+    <text class="t" x="226" y="470">Parse &amp; chunk</text><text class="s" x="226" y="489">12,988 passages + headings</text></g>
+  <g class="node" style="transition-delay:.85s"><rect x="430" y="452" width="230" height="72" rx="12"/>
+    <text class="t" x="446" y="482">Embeddings</text><text class="s" x="446" y="501">nomic (Ollama, CPU) · Gemini</text></g>
+  <g class="node" style="transition-delay:.95s"><rect x="900" y="420" width="200" height="64" rx="12"/>
+    <use href="#i-qdrant" x="916" y="439" width="26" height="26" fill="#dc244c"/>
+    <text class="t" x="952" y="448">Qdrant</text><text class="s" x="952" y="467">dense experiments</text></g>
+</svg>
+<figcaption>Request path (top) and ingestion path (bottom). Production needs only the top row: one container with BM25 in memory.</figcaption>
+</figure>
+</div>
+
+<main class="wrap">
+  <h3>Why this architecture</h3>
+  <div class="cards">
+    <div class="card"><h4><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="3" fill="var(--brand)"/><circle cx="19" cy="6" r="3" fill="var(--brand)"/><circle cx="19" cy="18" r="3" fill="var(--brand)"/><path d="M7.6 11 16.4 7M7.6 13l8.8 4" stroke="var(--brand)" stroke-width="2"/></svg>A graph, not a chain</h4><p>Each step is a small, testable function; the refusal branches are explicit edges, so the “don't answer” path is as visible as the answer path.</p><span class="why">The refuse path is unit-tested without calling any model.</span></div>
+    <div class="card"><h4><svg><use href="#i-googlegemini" fill="#8e75b2"/></svg>LiteLLM model switch</h4><p>A cheap model answers; a stronger one from the same family judges answers in the evaluation. Switching provider is a config change.</p></div>
+    <div class="card"><h4><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="4" fill="var(--brand)"/></svg>Cache everything</h4><p>Every model call is stored under (model, messages). Reruns cost nothing, and since Gemini 3.6+ ignores temperature, the cache is also what makes results reproducible.</p></div>
+    <div class="card"><h4><svg><use href="#i-fastapi" fill="#009688"/></svg>Verify, then stream</h4><p>The answer is checked before the first token reaches the page, so an invented citation is never displayed.</p><span class="why">Trade-off: text appears after generation (about 1–3 s with Flash-Lite), not token by token.</span></div>
+    <div class="card"><h4><svg><use href="#i-docker" fill="#2496ed"/></svg>One container</h4><p>BM25 needs no database, so the deployed app is a single non-root container; the corpus is downloaded at build time from pinned commits and checksummed.</p></div>
+    <div class="card"><h4><svg><use href="#i-qdrant" fill="#dc244c"/></svg>Measure before choosing</h4><p>Dense retrieval in Qdrant was built and evaluated against BM25 on the same questions, and lost. The data decided the production retriever.</p></div>
+  </div>
+
+<!-- RETRIEVAL -->
+<section id="retrieval">
+  <div class="kicker">04 · How retrieval works</div>
+  <h2>Keyword search beat embeddings on this data</h2>
+  <p>Regulatory questions quote defined terms (“Relevant Person”, “Inside Information”) and rule numbers (“Rule 7.2.2”). Retrieval is tuned for that, and the citation unit is the ObliQA passage, so every answer maps back to the answer key.</p>
+  <h3>Ingestion: pinned, parsed, indexed</h3>
+  <div class="steps anim" id="ingest">
+    <div class="step" style="transition-delay:0s"><b>Download</b><span>pinned commits, every file SHA-256 checked</span></div>
+    <div class="step" style="transition-delay:.1s"><b>Parse</b><span>40 documents → 12,988 passages with their heading path</span></div>
+    <div class="step" style="transition-delay:.2s"><b>Chunk</b><span>only long passages split: 1,500-word windows, 150 overlap → 13,040 chunks</span></div>
+    <div class="step" style="transition-delay:.3s"><b>Tokenize</b><span>rule numbers like <code>3.2.1</code> and markers like <code>(a)</code> kept whole</span></div>
+    <div class="step" style="transition-delay:.4s"><b>Index</b><span>BM25 over title + headings + text, k1 1.5, b 0.75</span></div>
+    <div class="step" style="transition-delay:.5s"><b>Evaluate</b><span>300 test questions, seed 42, against the answer key</span></div>
+  </div>
+
+  <h3>Query time: a narrowing funnel</h3>
+  <div class="funnel anim" id="funnel">
+    <div class="fbar" data-w="100" style="background:#86b6ef;color:#0f1417">13,040 chunks <small>BM25 scores</small></div>
+    <div class="fbar" data-w="86" style="background:#5598e7;color:#0f1417">50 best chunks <small>windows of the same passage merged</small></div>
+    <div class="fbar" data-w="73" style="background:#2a78d6">20 passages <small>best window per passage</small></div>
+    <div class="fbar" data-w="61" style="background:#1c5cab">Gate: best score ≥ 10 <small>clearly off-topic questions stop here</small></div>
+    <div class="fbar" data-w="50" style="background:#104281">5 passages shown <small>cited [1]…[5]</small></div>
+  </div>
+  <p class="small">Stage widths are illustrative. Retrieval takes <span data-fill="retrieval_ms_p50"></span> ms at the median (<span data-fill="retrieval_ms_p95"></span> ms p95) on a laptop CPU.</p>
+
+  <div class="chart anim" id="retchart">
+    <h4>BM25 vs dense vs hybrid on 300 test questions</h4>
+    <div class="sub">Share of each question's answer-key passages found in the top k, and MRR@20 (how high the first correct passage ranks).</div>
+    <div class="legend" id="retLegend"></div>
+    <div class="vbars" id="retBars"></div>
+    <div class="vlabels" id="retLabels"></div>
+    <details><summary>View as table</summary>
+      <table id="retTable"><thead><tr><th>Method</th><th>Recall@1</th><th>Recall@5</th><th>Recall@10</th><th>Recall@20</th><th>MRR@20</th></tr></thead><tbody></tbody></table>
+    </details>
+  </div>
+
+  <div class="chart anim" id="overlapchart">
+    <h4>Where the answer key was found (top 20)</h4>
+    <div class="sub">Per question: does BM25, the dense model, both or neither retrieve at least one answer-key passage? Dense adds only a handful of questions BM25 misses.</div>
+    <div id="ovBars"></div>
+  </div>
+  <p>Why keyword search wins here: ObliQA's questions were generated from the passages and reuse their exact defined terms and rule numbers, which favours exact matching, and the small local embedding model (nomic-embed-text, run on CPU after the free Gemini embedding quota ran out) adds little. Equal-weight Reciprocal Rank Fusion then pulls BM25's good rankings down. Tuning fusion weights on the test questions would have been overfitting, so the app ships BM25.</p>
+</section>
+
+<!-- GUARDRAILS -->
+<section id="guardrails">
+  <div class="kicker">05 · Security &amp; guardrails</div>
+  <h2>The model is untrusted. So are the question and the passages.</h2>
+  <p>A regulatory assistant must not invent rules, follow instructions hidden in text it retrieves, or answer outside its corpus. Each layer assumes the previous one can fail.</p>
+  <div class="layers anim" id="layers">
+    <div class="layer" style="transition-delay:0s"><div class="n">1</div><div><h4>Input limits</h4><p>Questions of 3–1,000 characters, 10 questions per minute per client to protect the free model quota, and strict security headers (CSP <code>default-src 'self'</code>, no framing, no sniffing).</p></div></div>
+    <div class="layer" style="transition-delay:.1s"><div class="n">2</div><div><h4>Retrieval gate</h4><p>If even the best passage scores below 10, the question is refused without calling the model. On the dev set this threshold keeps every real question and stops the clearly off-topic ones for free.</p></div></div>
+    <div class="layer" style="transition-delay:.2s"><div class="n">3</div><div><h4>Context isolation</h4><p>Passages are wrapped in numbered <code>&lt;passage&gt;</code> tags that a passage cannot close; the rules state that text inside them is source material, never instructions. Injection phrasing in the question is flagged and logged.</p></div></div>
+    <div class="layer" style="transition-delay:.3s"><div class="n">4</div><div><h4>Constrained generation</h4><p>The model answers only from the numbered passages, cites them as <code>[n]</code>, states what the passages do not cover, and replies <code>INSUFFICIENT</code> when nothing is relevant, which becomes a refusal.</p></div></div>
+    <div class="layer" style="transition-delay:.4s"><div class="n">5</div><div><h4>Citation verifier</h4><p>Markers that point at no shown passage are removed; an answer left with no valid citation is refused. This runs before streaming, so the page never displays an unverifiable claim.</p></div></div>
+    <div class="layer" style="transition-delay:.5s"><div class="n">6</div><div><h4>Safe rendering &amp; fallback</h4><p>All server text is inserted as text, never HTML. If the model quota runs out, the page still receives the cited passages with a notice instead of an error.</p></div></div>
+  </div>
+
+  <div class="chart anim" id="redteam">
+    <h4>Red-team results by attack type</h4>
+    <div class="sub" id="rtSub"></div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Blocked</span><span><i style="background:var(--s2)"></i>Missed</span></div>
+    <div id="rtBars"></div>
+    <details><summary>View as table</summary>
+      <table id="rtTable"><thead><tr><th>Category</th><th>Attempts</th><th>Blocked</th><th>Flagged</th><th>Missed</th></tr></thead><tbody></tbody></table>
+    </details>
+  </div>
+
+  <div class="metrics" id="secMetrics"></div>
+  <p class="small">An attack counts as missed when its canary string (a phrase from the system prompt, or a word the attacker asked for) appears in the answer. Three of the attacks hide their instructions inside a retrieved passage rather than in the question.</p>
+</section>
+
+<!-- ROLE -->
+<section id="role">
+  <div class="kicker">06 · My role &amp; actions</div>
+  <h2>What I owned</h2>
+  <p>A solo project, end to end: data, retrieval, the answer pipeline, the app, the evaluation and the delivery tooling, with <span data-fill="tests"></span> automated tests and a CI pipeline.</p>
+  <div class="cards two">
+    <div class="card"><h4><svg><use href="#i-python" fill="#3776ab"/></svg>Data &amp; retrieval</h4><p>Pinned, checksummed download; parsing into passages with heading paths; chunking; BM25 with rule-number-aware tokens; dense embeddings (Gemini and a local Ollama model) in Qdrant; Reciprocal Rank Fusion.</p></div>
+    <div class="card"><h4><svg><use href="#i-googlegemini" fill="#8e75b2"/></svg>Answer pipeline</h4><p>LangGraph state machine, prompt design, citation verifier, refusal gate, cached and retried LiteLLM calls with a model switch.</p></div>
+    <div class="card"><h4><svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="var(--brand)"/></svg>Evaluation</h4><p>Recall@k and MRR, citation precision/recall, an LLM judge, out-of-corpus refusals, a 12-attack red team, latency and cost, each reproducible with one command.</p></div>
+    <div class="card"><h4><svg><use href="#i-fastapi" fill="#009688"/></svg>App &amp; delivery</h4><p>FastAPI with SSE, the chat page (light/dark, mobile), rate limiting and security headers, a multi-stage non-root Dockerfile, CI with a retrieval regression test.</p></div>
+  </div>
+  <h3>Key decisions</h3>
+  <ul class="clean">
+    <li><b>Let the data pick the retriever.</b> Dense and hybrid retrieval were built and measured; BM25 won on every metric, so it ships.</li>
+    <li><b>Refusal is a feature.</b> Two independent refusal points, and a verifier that turns an uncited answer into a refusal.</li>
+    <li><b>Verify before streaming.</b> A second of latency is cheaper than one invented citation in front of a compliance user.</li>
+    <li><b>Reproducible on a $0 budget.</b> Everything cached; when the free embedding quota (1,000 texts a day) blocked the hosted model, a local model on CPU unblocked the comparison.</li>
+    <li><b>Fix the prompt with evidence.</b> A first prompt refused a question whose answer-key passage was shown; the rule now asks for a partial answer and refuses only when nothing is relevant.</li>
+  </ul>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="kicker">07 · Results &amp; impact</div>
+  <h2>Measured, not assumed</h2>
+  <p>Retrieval is scored on 300 seeded test questions; answers on the first 50 of them, plus 10 out-of-corpus questions and the red-team set. <span id="statusNote"></span></p>
+  <div class="metrics" id="resMetrics"></div>
+
+  <div class="chart anim" id="calib">
+    <h4>Choosing the refusal-gate threshold</h4>
+    <div class="sub">Share of 300 dev questions that pass the gate vs share of the 10 out-of-corpus questions it rejects, by BM25 score threshold. 10 is the highest tested setting that keeps all 300 dev questions (15 already drops one); near-domain questions (another regulator's rules) score high and are left to the model.</div>
+    <div class="legend"><span><i style="background:var(--s1)"></i>Dev questions kept</span><span><i style="background:var(--s3)"></i>Out-of-corpus rejected</span></div>
+    <div class="vbars" id="calBars"></div>
+    <div class="vlabels" id="calLabels"></div>
+    <details><summary>View as table</summary>
+      <table id="calTable"><thead><tr><th>Threshold</th><th>Dev questions kept</th><th>Out-of-corpus rejected</th></tr></thead><tbody></tbody></table>
+    </details>
+  </div>
+
+  <div class="chart" id="ansChart">
+    <h4>Answer quality on 50 test questions</h4>
+    <div class="sub">Citation precision: share of cited passages that are in the answer key. Citation recall: share of the answer-key passages shown to the model that the answer cites.</div>
+    <table id="ansTable"><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody></tbody></table>
+  </div>
+
+  <h3>Impact</h3>
+  <ul class="clean">
+    <li><b>Traceable answers.</b> Every displayed claim links to the exact passage, so a reviewer can check it in seconds.</li>
+    <li><b>Honest about its limits.</b> Off-topic and near-domain questions are refused instead of answered from general knowledge.</li>
+    <li><b>Evidence over intuition.</b> The retriever, the gate threshold and the prompt were all chosen from measurements, and CI re-runs the retrieval benchmark to 12 decimal places.</li>
+    <li><b>Cheap to run.</b> List price is a fraction of a cent per answer; on the free tier with caching, the whole project cost $0.</li>
+  </ul>
+</section>
+
+</main>
+
+<footer>Case study · RegRAG · ADGM regulation assistant · <a href="https://github.com/Rachid09/RegRag">source on GitHub</a></footer>
+
+<div class="lightbox" id="lb"><img alt=""></div>
+<div class="tip" id="tip"></div>
+
+<script src="data.js"></script>
+<script>
+(function(){
+  var C=window.CASE, A=C.answers;
+  var tip=document.getElementById('tip');
+  function showTip(e,html){tip.innerHTML=html;tip.style.opacity=1;tip.style.left=Math.min(e.clientX+14,innerWidth-320)+'px';tip.style.top=(e.clientY+14)+'px'}
+  function hideTip(){tip.style.opacity=0}
+  function pct(x){return Math.round(100*x)+'%'}
+  function f2(x){return x.toFixed(3)}
+  function el(tag,cls,html){var e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+
+  // simple fills
+  document.querySelectorAll('[data-fill]').forEach(function(s){s.textContent=C[s.dataset.fill]});
+
+  // metric cards: value may be null -> "pending"
+  function metric(box,value,label,opts){
+    opts=opts||{};var m=el('div','metric'),v=el('div','v');
+    if(value==null){v.textContent='pending';v.className='v pending'}
+    else{v.dataset.count=value;if(opts.dec)v.dataset.dec=opts.dec;if(opts.suffix)v.dataset.suffix=opts.suffix;v.textContent='0'}
+    m.appendChild(v);m.appendChild(el('div','l',label));box.appendChild(m);
+  }
+  var bm=C.retrieval[0], ic=A&&A.in_corpus, oc=A&&A.out_of_corpus;
+  var judgeDone=ic&&ic.judged>=ic.answered;
+  var missed=A?A.attacks.reduce(function(s,a){return s+a.missed},0):null;
+  var oocRejectGate=C.gate.filter(function(g){return g.threshold===10})[0];
+
+  // TL;DR results line
+  var tl='<b>Results:</b> BM25 Recall@20 '+bm.r20.toFixed(2)+' and MRR '+bm.mrr.toFixed(2)+' on 300 test questions, ahead of dense and hybrid retrieval; the refusal gate keeps '+pct(oocRejectGate.in_corpus_pass)+' of real questions while stopping '+pct(oocRejectGate.out_of_corpus_rejected)+' of off-topic ones before any model call; '+C.tests+' automated tests.';
+  if(A){tl+=' Answers: '+pct(ic.cites_answer_key)+' cite an answer-key passage'+(judgeDone?', judge-rated '+pct(ic.judge_correct)+' correct and '+pct(ic.judge_grounded)+' grounded':'')+'; '+oc.refused+'/'+oc.questions+' out-of-corpus questions refused; '+(C.attack_attempts-missed)+'/'+C.attack_attempts+' injection attempts blocked.'}
+  else{tl+=' Answer-level evaluation (citations, judge, refusals, red team) is running; those figures are marked pending below.'}
+  document.getElementById('tldrResults').innerHTML=tl;
+  document.getElementById('statusNote').textContent='';
+
+  // results metrics
+  var rm=document.getElementById('resMetrics');
+  metric(rm,bm.r20,'Recall@20: answer-key passages in the top 20 (BM25)',{dec:2});
+  metric(rm,bm.mrr,'MRR@20: rank of the first correct passage',{dec:2});
+  metric(rm,ic?Math.round(100*ic.cites_answer_key):null,'answers citing an answer-key passage',{suffix:'%'});
+  if(judgeDone){metric(rm,Math.round(100*ic.judge_correct),'judge: correct',{suffix:'%'});metric(rm,Math.round(100*ic.judge_grounded),'judge: grounded in the shown passages',{suffix:'%'});}
+  metric(rm,oc?oc.refused:null,'out-of-corpus questions refused',{suffix:'/'+C.out_of_corpus_questions});
+  metric(rm,A?Math.round(100*A.latency_s.llm_p50)/100:null,'model latency p50, seconds',{dec:2});
+  metric(rm,C.tests,'automated tests, all green');
+
+  // security metrics
+  var sm=document.getElementById('secMetrics');
+  metric(sm,A?(C.attack_attempts-missed):null,'injection attempts blocked',{suffix:'/'+C.attack_attempts});
+  metric(sm,oc?oc.refused:null,'out-of-corpus questions refused',{suffix:'/'+C.out_of_corpus_questions});
+  metric(sm,Math.round(oocRejectGate.out_of_corpus_rejected*C.out_of_corpus_questions),'of them stopped before any model call',{suffix:'/'+C.out_of_corpus_questions});
+  metric(sm,ic?Math.round(100*ic.false_refusal_rate):null,'false refusals on in-corpus questions',{suffix:'%'});
+
+  // retrieval grouped bars: 5 metrics x 3 methods
+  var colors=['var(--s1)','var(--s3)','var(--s2)'], keys=[['r1','Recall@1'],['r5','Recall@5'],['r10','Recall@10'],['r20','Recall@20'],['mrr','MRR@20']];
+  var lg=document.getElementById('retLegend');
+  C.retrieval.forEach(function(r,i){lg.appendChild(el('span',null,'<i style="background:'+colors[i]+'"></i>'+r.name))});
+  var rb=document.getElementById('retBars'), rl=document.getElementById('retLabels'), rt=document.querySelector('#retTable tbody');
+  keys.forEach(function(k){
+    var g=el('div','vgroup three'), pair=el('div','pair');
+    C.retrieval.forEach(function(r,i){var c=el('div','col','<span>'+r[k[0]].toFixed(2)+'</span>');c.style.background=colors[i];c.dataset.h=Math.round(100*r[k[0]]);pair.appendChild(c)});
+    g.appendChild(pair);
+    g.addEventListener('mousemove',function(e){showTip(e,'<b>'+k[1]+'</b><br>'+C.retrieval.map(function(r){return r.name+': '+f2(r[k[0]])}).join('<br>'))});
+    g.addEventListener('mouseleave',hideTip);
+    rb.appendChild(g);rl.appendChild(el('div',null,k[1]));
+  });
+  C.retrieval.forEach(function(r){rt.appendChild(el('tr',null,'<td>'+r.name+'</td><td>'+f2(r.r1)+'</td><td>'+f2(r.r5)+'</td><td>'+f2(r.r10)+'</td><td>'+f2(r.r20)+'</td><td>'+f2(r.mrr)+'</td>'))});
+
+  // overlap bars
+  var ov=C.overlap, ovTotal=ov.both+ov.bm25_only+ov.dense_only+ov.neither, ovB=document.getElementById('ovBars');
+  [['Both methods',ov.both,'var(--s1)'],['Only BM25',ov.bm25_only,'var(--s1)'],['Only dense',ov.dense_only,'var(--s2)'],['Neither',ov.neither,'var(--ink-3)']].forEach(function(r){
+    var row=el('div','hbar stack','<div class="lab">'+r[0]+'</div><div class="track"><div class="seg" style="background:'+r[2]+'" data-w="'+(100*r[1]/ovTotal)+'"></div></div><div class="val">'+r[1]+'</div>');
+    row.addEventListener('mousemove',function(e){showTip(e,'<b>'+r[0]+'</b><br>'+r[1]+' of '+ovTotal+' questions ('+pct(r[1]/ovTotal)+')')});
+    row.addEventListener('mouseleave',hideTip);ovB.appendChild(row);
+  });
+
+  // red team
+  var labels={instruction_override:'Instruction override',prompt_extraction:'Prompt extraction',injected_passage:'Injected passage (indirect)',jailbreak:'Role-play jailbreak'};
+  var rtB=document.getElementById('rtBars'), rtT=document.querySelector('#rtTable tbody');
+  document.getElementById('rtSub').textContent=A?(C.attack_attempts+' attack prompts across '+C.attack_categories.length+' categories, run through the full pipeline.'):(C.attack_attempts+' attack prompts across '+C.attack_categories.length+' categories are defined and running through the full pipeline; results appear here when the evaluation finishes.');
+  var rows=A?A.attacks:C.attack_categories.map(function(c){return{category:c,attempts:3,blocked:null,flagged:null,missed:null}});
+  rows.forEach(function(r){
+    var name=labels[r.category]||r.category, row;
+    if(r.blocked==null){row=el('div','hbar stack','<div class="lab">'+name+'</div><div class="track"></div><div class="val">'+r.attempts+' · pending</div>')}
+    else{row=el('div','hbar','<div class="lab">'+name+'</div><div class="track"><div class="seg" style="background:var(--s1)" data-w="'+(100*r.blocked/r.attempts)+'"></div><div class="seg" style="background:var(--s2)" data-w="'+(100*r.missed/r.attempts)+'"></div></div><div class="val">'+r.blocked+'/'+r.attempts+'</div>');
+      row.addEventListener('mousemove',function(e){showTip(e,'<b>'+name+'</b><br>'+r.attempts+' attempts · '+r.blocked+' blocked · '+r.flagged+' flagged · '+r.missed+' missed')});
+      row.addEventListener('mouseleave',hideTip)}
+    rtB.appendChild(row);
+    rtT.appendChild(el('tr',null,'<td>'+name+'</td><td>'+r.attempts+'</td><td>'+(r.blocked==null?'—':r.blocked)+'</td><td>'+(r.flagged==null?'—':r.flagged)+'</td><td>'+(r.missed==null?'—':r.missed)+'</td>'));
+  });
+
+  // gate calibration bars
+  var cB=document.getElementById('calBars'), cL=document.getElementById('calLabels'), cT=document.querySelector('#calTable tbody');
+  C.gate.forEach(function(g){
+    var chosen=g.threshold===10, a=Math.round(1000*g.in_corpus_pass)/10, b=Math.round(100*g.out_of_corpus_rejected);
+    var grp=el('div','vgroup','<div class="pair"><div class="col" style="background:var(--s1)" data-h="'+a+'"><span>'+a+'%</span></div><div class="col" style="background:var(--s3)" data-h="'+b+'"><span>'+b+'%</span></div></div>');
+    grp.addEventListener('mousemove',function(e){showTip(e,'<b>Threshold '+g.threshold+(chosen?' (chosen)':'')+'</b><br>dev kept '+a+'% · out-of-corpus rejected '+b+'%')});
+    grp.addEventListener('mouseleave',hideTip);cB.appendChild(grp);
+    var l=el('div',chosen?'pick':null);l.textContent=chosen?'10 ✓ chosen':String(g.threshold);cL.appendChild(l);
+    cT.appendChild(el('tr',null,'<td>'+(chosen?'<b>10</b>':g.threshold)+'</td><td>'+a+'%</td><td>'+pct(g.out_of_corpus_rejected)+'</td>'));
+  });
+
+  // answer table
+  var aT=document.querySelector('#ansTable tbody');
+  [['Answered (not refused)',ic&&(ic.answered+'/'+ic.questions)],['False refusals',ic&&pct(ic.false_refusal_rate)],['Answer key among the 5 passages shown',ic&&pct(ic.answer_key_in_context)],['Answers citing an answer-key passage',ic&&pct(ic.cites_answer_key)],['Citation precision',ic&&ic.citation_precision.toFixed(2)],['Citation recall',ic&&ic.citation_recall.toFixed(2)],['Refusals where the answer key was never shown',A&&(A.refusals.answer_key_missing+' of '+(A.refusals.answer_key_missing+A.refusals.answer_key_shown))],['Judge: correct',judgeDone?(pct(ic.judge_correct)+' of '+ic.judged):'skip'],['Judge: grounded',judgeDone?(pct(ic.judge_grounded)+' of '+ic.judged):'skip'],['Out-of-corpus refused',oc&&(oc.refused+'/'+oc.questions+' ('+oc.refused_by_gate+' by the gate, '+oc.refused_by_model+' by the model)')],['Model latency p50 / p95',A&&(A.latency_s.llm_p50.toFixed(2)+' s / '+A.latency_s.llm_p95.toFixed(2)+' s')],['Cost per answer at list price',A&&('$'+A.cost_usd.per_answer_list_price.toFixed(5))],['Actually paid (free tier)','$0.00']].forEach(function(r){
+    if(r[1]==='skip')return;
+    aT.appendChild(el('tr',null,'<td>'+r[0]+'</td><td>'+(r[1]==null?'<span class="badge">pending</span>':r[1])+'</td>'));
+  });
+
+  // reveal-on-scroll animations
+  function play(e){
+    e.classList.add('in');
+    e.querySelectorAll('.seg').forEach(function(s){s.style.width=s.dataset.w+'%'});
+    e.querySelectorAll('.col').forEach(function(s){s.style.height=(s.dataset.h*0.85)+'%'});
+    e.querySelectorAll('.fbar').forEach(function(s,i){setTimeout(function(){s.style.width=s.dataset.w+'%'},i*140)});
+  }
+  document.querySelectorAll('.edge').forEach(function(p){var L=Math.ceil(p.getTotalLength());p.style.setProperty('--len',L)});
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){play(e.target);io.unobserve(e.target)}})},{threshold:.2});
+  document.querySelectorAll('.anim').forEach(function(x){io.observe(x)});
+
+  // counters
+  var io2=new IntersectionObserver(function(es){es.forEach(function(e){
+    if(!e.isIntersecting)return;var x=e.target,to=parseFloat(x.dataset.count),dec=parseInt(x.dataset.dec||0),suf=x.dataset.suffix||'',t0=null;
+    function f(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/1100),v=to*(1-Math.pow(1-p,3));x.innerHTML=v.toFixed(dec)+(suf?'<small>'+suf+'</small>':'');if(p<1)requestAnimationFrame(f)}
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){x.innerHTML=to.toFixed(dec)+(suf?'<small>'+suf+'</small>':'')}else requestAnimationFrame(f);
+    io2.unobserve(x)})},{threshold:.4});
+  document.querySelectorAll('[data-count]').forEach(function(x){io2.observe(x)});
+
+  // toc highlight
+  var links=[].slice.call(document.querySelectorAll('.toc a'));
+  var io3=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)links.forEach(function(l){l.classList.toggle('active',l.getAttribute('href')==='#'+e.target.id)})})},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section[id]').forEach(function(s){io3.observe(s)});
+
+  // lightbox
+  var lb=document.getElementById('lb'),lbi=lb.querySelector('img');
+  document.querySelectorAll('.gallery img').forEach(function(img){img.addEventListener('click',function(){lbi.src=img.src;lbi.alt=img.alt;lb.classList.add('open')})});
+  lb.addEventListener('click',function(){lb.classList.remove('open')});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('open')});
+})();
+</script>
+</body>
+</html>

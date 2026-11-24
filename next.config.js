@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  // Case studies are static folders in public/case-studies/<slug>/ whose pages use
+  // relative asset paths, so their trailing slash must be kept. Trailing slashes
+  // are handled in src/middleware.ts instead (stripped everywhere else, as before).
+  skipTrailingSlashRedirect: true,
   images: {
     remotePatterns: [
       {

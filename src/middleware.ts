@@ -29,6 +29,37 @@ export function middleware(request: NextRequest) {
   // Skip static assets served from `public` (anything with a file extension)
   if (/\.[^/]+$/.test(pathname)) return;
 
+  // Case studies index: rendered by app/[lang]/case-studies, served at /case-studies/
+  if (pathname === "/case-studies" || pathname === "/case-studies/") {
+    return NextResponse.rewrite(
+      new URL(`/${i18n.defaultLocale}/case-studies`, request.url)
+    );
+  }
+
+  // Static case studies in public/case-studies/<slug>/index.html.
+  // Their assets are relative, so the trailing slash is required.
+  // Plain URL objects: NextURL would re-apply the request's trailing-slash state.
+  const search = request.nextUrl.search;
+  const caseStudy = pathname.match(/^\/case-studies\/([a-z0-9-]+)(\/?)$/);
+  if (caseStudy) {
+    if (!caseStudy[2]) {
+      return NextResponse.redirect(
+        new URL(`/case-studies/${caseStudy[1]}/${search}`, request.url),
+        308
+      );
+    }
+    return NextResponse.rewrite(
+      new URL(`/case-studies/${caseStudy[1]}/index.html${search}`, request.url)
+    );
+  }
+
+  // Everywhere else keep Next's default of stripping trailing slashes
+  // (disabled globally by skipTrailingSlashRedirect in next.config.js).
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    const stripped = pathname.replace(/\/+$/, "") || "/";
+    return NextResponse.redirect(new URL(stripped + search, request.url), 308);
+  }
+
   // Check if there is any supported locale in the pathname
   const pathnameIsMissingLocale = i18n.locales.every(
     (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
