@@ -45,11 +45,11 @@ export default function CaseStudiesPage() {
                 <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-black/5">
                   <Image
                     src={cs.thumbnail}
-                    alt={`Screenshot from the ${cs.title.split(":")[0]} case study`}
+                    alt={`${cs.title.split(":")[0]} case study thumbnail`}
                     fill
                     sizes="(min-width: 640px) 42rem, 100vw"
                     loading="lazy"
-                    className="object-cover object-top transition group-hover:scale-[1.02]"
+                    className="object-cover transition group-hover:scale-[1.02]"
                   />
                 </div>
                 <div className="px-5 pt-4 pb-6 sm:px-8">

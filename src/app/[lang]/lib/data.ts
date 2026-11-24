@@ -65,7 +65,7 @@ export const caseStudiesData = [
     timeline: "Nov 2026",
     role: "Solo, open-source",
     tags: ["RAG", "BM25", "LangGraph", "Evaluation"],
-    thumbnail: "/case-studies/regrag/assets/screens/answer-light.jpg",
+    thumbnail: "/case-studies/regrag/thumb.png",
   },
   {
     slug: "dojo-wizard-rag",
@@ -75,7 +75,7 @@ export const caseStudiesData = [
     timeline: "Nov 2025 – Jan 2026",
     role: "Lead AI Engineer",
     tags: ["RAG", "Qdrant", "Gemini", "Guardrails"],
-    thumbnail: "/case-studies/dojo-wizard-rag/assets/screens/wizard-panel-light.jpg",
+    thumbnail: "/case-studies/dojo-wizard-rag/thumb.png",
   },
   {
     slug: "dojo-lab-wizard-agent",
@@ -86,8 +86,7 @@ export const caseStudiesData = [
     timeline: "Dec 2025 – Jan 2026",
     role: "Feature owner",
     tags: ["AI agents", "Function calling", "Tool security", "Evaluation"],
-    thumbnail:
-      "/case-studies/dojo-lab-wizard-agent/assets/screens/step-1-answer.jpg",
+    thumbnail: "/case-studies/dojo-lab-wizard-agent/thumb.png",
   },
   {
     slug: "dojo-hints",
@@ -97,7 +96,7 @@ export const caseStudiesData = [
     timeline: "Dec 2025 – Jan 2026",
     role: "Feature owner",
     tags: ["LLM guardrails", "Celery", "Evaluation"],
-    thumbnail: "/case-studies/dojo-hints/assets/screens/dojo-hints-lab-page.jpg",
+    thumbnail: "/case-studies/dojo-hints/thumb.png",
   },
   {
     slug: "intelligent-pathways",
@@ -108,8 +107,7 @@ export const caseStudiesData = [
     timeline: "Sep – Nov 2025",
     role: "Feature owner",
     tags: ["Structured output", "Recommenders", "Guardrails"],
-    thumbnail:
-      "/case-studies/intelligent-pathways/assets/screens/assistant-and-frameworks.jpg",
+    thumbnail: "/case-studies/intelligent-pathways/thumb.png",
   },
 ] as const;
 
